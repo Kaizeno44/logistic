@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html class="light" lang="vi">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Hệ Thống Giao Hàng | UTH Express</title>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary-fixed": "#370e00", "inverse-surface": "#293040", "on-secondary-container": "#5c6274",
+                        "surface": "#f9f9ff", "on-background": "#141b2b", "error": "#ba1a1a", "surface-container-high": "#e1e8fd",
+                        "surface-container-lowest": "#ffffff", "primary-container": "#370e00", "on-primary": "#ffffff",
+                        "on-surface": "#141b2b", "on-primary-container": "#e05814", "surface-container-low": "#f1f3ff",
+                        "outline": "#76777d"
+                    },
+                    fontFamily: { "headline": ["Inter"], "body": ["Inter"], "label": ["Inter"] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .kinetic-gradient { background: linear-gradient(135deg, #e05814 0%, #a63b00 100%); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body overflow-hidden">
+<main class="flex h-screen w-full">
+    
+    <section class="hidden lg:flex lg:w-1/2 relative bg-on-background overflow-hidden items-end p-16">
+        <div class="absolute inset-0 z-0">
+            <img alt="Logistics Hub" class="w-full h-full object-cover opacity-40 mix-blend-luminosity" src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070&auto=format&fit=crop"/>
+            <div class="absolute inset-0 bg-gradient-to-t from-on-background via-on-background/80 to-transparent"></div>
+        </div>
+        <div class="relative z-10 max-w-xl">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-10 h-10 kinetic-gradient rounded-xl flex items-center justify-center text-white shadow-lg">
+                    <span class="material-symbols-outlined">dataset</span>
+                </div>
+                <span class="text-2xl font-black text-white tracking-tighter italic">UTH Express</span>
+            </div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/20 border border-orange-500/30 mb-6">
+                <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
+                <span class="text-xs font-bold tracking-widest text-orange-400 uppercase">Microservices Architecture</span>
+            </div>
+            <h1 class="text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.1] mb-6">
+                Kiến trúc <span class="text-orange-500">Điều phối</span><br/>Thời gian thực.
+            </h1>
+            <p class="text-slate-300 text-lg leading-relaxed font-light mb-12">
+                Nền tảng giao hàng siêu tốc ứng dụng RabbitMQ. Xử lý hàng nghìn đơn hàng bất đồng bộ với độ trễ siêu thấp.
+            </p>
+            <div class="flex gap-12 text-slate-400">
+                <div class="flex flex-col gap-1">
+                    <span class="text-2xl font-bold text-white">99.9%</span>
+                    <span class="text-[10px] uppercase tracking-widest font-bold">Uptime SLA</span>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <span class="text-2xl font-bold text-white"><200ms</span>
+                    <span class="text-[10px] uppercase tracking-widest font-bold">Matching Latency</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="w-full lg:w-1/2 flex flex-col bg-surface overflow-y-auto relative">
+        <div class="flex-grow flex items-center justify-center p-8 md:p-16">
+            <div class="w-full max-w-md space-y-8">
+                
+                <div class="lg:hidden flex items-center justify-center gap-2 mb-8">
+                    <div class="w-8 h-8 kinetic-gradient rounded-lg flex items-center justify-center text-white">
+                        <span class="material-symbols-outlined text-sm">dataset</span>
+                    </div>
+                    <span class="text-xl font-black text-on-background tracking-tighter italic">UTH Express</span>
+                </div>
+
+                <div id="loginSection">
+                    <header class="mb-10 text-center lg:text-left">
+                        <h2 class="text-3xl font-extrabold tracking-tighter text-on-background mb-2">Đăng Nhập Hệ Thống</h2>
+                        <p class="text-on-secondary-container font-medium">Truy cập bảng điều khiển vận hành trung tâm.</p>
+                    </header>
+                    <form id="loginForm" class="space-y-5">
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline group-focus-within:text-on-primary-container transition-colors">
+                                <span class="material-symbols-outlined text-[20px]">person</span>
+                            </div>
+                            <input id="loginUsername" class="block w-full pl-12 pr-4 py-4 bg-surface-container-low border-none rounded-xl text-on-surface placeholder-outline focus:ring-2 focus:ring-on-primary-container/20 transition-all font-medium outline-none" placeholder="Tên đăng nhập" type="text" required/>
+                        </div>
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline group-focus-within:text-on-primary-container transition-colors">
+                                <span class="material-symbols-outlined text-[20px]">lock</span>
+                            </div>
+                            <input id="loginPassword" class="block w-full pl-12 pr-12 py-4 bg-surface-container-low border-none rounded-xl text-on-surface placeholder-outline focus:ring-2 focus:ring-on-primary-container/20 transition-all font-medium outline-none" placeholder="Mật khẩu" type="password" required/>
+                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center cursor-pointer" onclick="togglePass('loginPassword')">
+                                <span class="material-symbols-outlined text-outline hover:text-on-surface text-[20px]">visibility_off</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between py-2">
+                            <label class="inline-flex items-center cursor-pointer group">
+                                <input id="rememberMe" class="w-4 h-4 rounded border-outline-variant text-on-primary-container focus:ring-on-primary-container/30" type="checkbox" checked/>
+                                <span class="ml-2 text-sm font-semibold text-on-secondary-container group-hover:text-on-surface transition-colors">Nhớ tài khoản</span>
+                            </label>
+                            <a href="#" class="text-sm font-bold text-on-primary-container hover:underline btn-show-forgot">Quên mật khẩu?</a>
+                        </div>
+                        <button id="loginBtn" type="submit" class="w-full kinetic-gradient text-white py-4 px-6 rounded-xl font-bold tracking-tight text-sm flex items-center justify-center gap-2 shadow-xl shadow-on-primary-container/20 active:scale-[0.98] transition-transform">
+                            ĐĂNG NHẬP <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                        </button>
+                    </form>
+                    <div class="mt-8 text-center">
+                        <p class="text-sm font-medium text-on-secondary-container">
+                            Chưa có tài khoản? <a href="#" class="text-on-primary-container font-extrabold hover:underline btn-show-register">Đăng ký Đối tác</a>
+                        </p>
+                    </div>
+                    <div class="mt-8 pt-6 border-t border-slate-200 text-center">
+                        <p class="text-sm text-slate-500 font-medium mb-4">Bạn có xe và muốn kiếm thêm thu nhập?</p>
+                        <a href="driver-register.html" class="inline-flex items-center justify-center w-full gap-2 px-4 py-3.5 bg-slate-900 text-white font-black text-sm rounded-xl hover:bg-slate-800 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                        <span class="material-symbols-outlined text-orange-500">local_taxi</span>
+                    ĐĂNG KÝ TRỞ THÀNH ĐỐI TÁC TÀI XẾ
+                </a>
+            </div>
+                </div>
+
+                <div id="registerSection" class="hidden">
+                    <header class="mb-10 text-center lg:text-left">
+                        <h2 class="text-3xl font-extrabold tracking-tighter text-on-background mb-2">Trở Thành Đối Tác</h2>
+                        <p class="text-on-secondary-container font-medium">Đăng ký để tham gia mạng lưới vận chuyển.</p>
+                    </header>
+                    <form id="registerForm" class="space-y-5">
+                        <div class="relative group">
+                            <label class="block text-[10px] font-bold text-outline uppercase tracking-wider mb-1 px-1">Tên đăng nhập</label>
+                            <input id="regUsername" class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3.5 text-on-surface focus:ring-2 focus:ring-on-primary-container/20 transition-all outline-none" type="text" required/>
+                        </div>
+                        <div class="relative group">
+                            <label class="block text-[10px] font-bold text-outline uppercase tracking-wider mb-1 px-1">Email</label>
+                            <input id="regEmail" class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3.5 text-on-surface focus:ring-2 focus:ring-on-primary-container/20 transition-all outline-none" type="email" required/>
+                        </div>
+                        <div class="relative group">
+                            <label class="block text-[10px] font-bold text-outline uppercase tracking-wider mb-1 px-1">Mật khẩu</label>
+                            <input id="regPassword" class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3.5 text-on-surface focus:ring-2 focus:ring-on-primary-container/20 transition-all outline-none" type="password" required/>
+                            <div class="absolute bottom-0 top-[26px] right-0 pr-4 flex items-center cursor-pointer" onclick="togglePass('regPassword')">
+                                <span class="material-symbols-outlined text-outline hover:text-on-surface text-[20px]">visibility_off</span>
+                            </div>
+                        </div>
+                        <button id="registerBtn" type="submit" class="w-full kinetic-gradient text-white py-4 px-6 rounded-xl font-bold tracking-tight text-sm flex items-center justify-center gap-2 shadow-xl shadow-on-primary-container/20 active:scale-[0.98] transition-transform mt-4">
+                            XÁC NHẬN ĐĂNG KÝ <span class="material-symbols-outlined text-[18px]">person_add</span>
+                        </button>
+                    </form>
+                    <div class="mt-8 text-center">
+                        <a href="#" class="inline-flex items-center gap-2 text-sm font-semibold text-on-surface-variant hover:text-on-primary-container transition-colors btn-back-login">
+                            <span class="material-symbols-outlined text-lg">arrow_back</span> Quay lại Đăng nhập
+                        </a>
+                    </div>
+                </div>
+
+                <div id="forgotStep1Section" class="hidden">
+                    <header class="mb-10 text-center lg:text-left">
+                        <h2 class="text-3xl font-extrabold tracking-tighter text-on-background mb-2">Quên Mật Khẩu?</h2>
+                        <p class="text-on-secondary-container font-medium">Nhập Tên đăng nhập để nhận mã OTP qua Email.</p>
+                    </header>
+                    <form id="forgotFormStep1" class="space-y-6">
+                        <div class="relative group">
+                            <label class="block text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-2">Tên đăng nhập</label>
+                            <div class="relative">
+                                <input id="forgotUsername" class="w-full bg-surface-container-low border-none rounded-xl py-4 px-5 text-on-surface focus:ring-2 focus:ring-on-primary-container transition-all outline-none" required type="text"/>
+                                <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-outline">
+                                    <span class="material-symbols-outlined">badge</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="btnGetOtp" type="submit" class="w-full bg-slate-900 text-white py-4 px-6 rounded-xl font-bold tracking-wide shadow-xl hover:bg-slate-800 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                            <span>GỬI MÃ XÁC NHẬN</span> <span class="material-symbols-outlined text-xl">mail</span>
+                        </button>
+                    </form>
+                    <div class="mt-10 text-center">
+                        <a href="#" class="inline-flex items-center gap-2 text-sm font-semibold text-on-surface-variant hover:text-on-primary-container transition-colors btn-back-login">
+                            <span class="material-symbols-outlined text-lg">arrow_back</span> Trở lại Đăng nhập
+                        </a>
+                    </div>
+                </div>
+
+                <div id="forgotStep2Section" class="hidden">
+                    <header class="mb-10 text-center lg:text-left">
+                        <h2 class="text-3xl font-extrabold tracking-tighter text-green-600 mb-2">Check Email!</h2>
+                        <p class="text-on-secondary-container font-medium">Mã bảo mật (OTP) đã được gửi đến email của bạn.</p>
+                    </header>
+                    <form id="forgotFormStep2" class="space-y-5">
+                        <div class="relative group">
+                            <label class="block text-[10px] font-bold text-outline uppercase tracking-wider mb-1 px-1">Mã OTP (6 số)</label>
+                            <input id="forgotOtp" class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3.5 text-on-surface text-center font-bold tracking-[0.5em] focus:ring-2 focus:ring-green-500 outline-none" type="text" required/>
+                        </div>
+                        <div class="relative group">
+                            <label class="block text-[10px] font-bold text-outline uppercase tracking-wider mb-1 px-1">Mật khẩu mới</label>
+                            <input id="forgotNewPassword" class="w-full bg-surface-container-low border-none rounded-xl px-4 py-3.5 text-on-surface focus:ring-2 focus:ring-green-500 transition-all outline-none" type="password" required/>
+                        </div>
+                        <button id="btnResetPass" type="submit" class="w-full bg-green-600 text-white py-4 px-6 rounded-xl font-bold tracking-tight text-sm flex items-center justify-center gap-2 shadow-xl shadow-green-600/20 active:scale-[0.98] transition-transform mt-4">
+                            CẬP NHẬT MẬT KHẨU <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                        </button>
+                    </form>
+                    <div class="mt-8 text-center">
+                        <a href="#" class="inline-flex items-center gap-2 text-sm font-semibold text-red-500 hover:text-red-700 transition-colors btn-back-login">
+                            <span class="material-symbols-outlined text-lg">cancel</span> Hủy thao tác
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <footer class="mt-auto px-8 py-6 border-t border-slate-200/50 flex justify-between items-center text-xs font-bold uppercase tracking-widest text-slate-400">
+            <span>© 2026 UTH Express</span>
+            
+        </footer>
+    </section>
+
+</main>
+
+<script>
+    // ==========================================
+    // 1. CẤU HÌNH API
+    // ==========================================
+    const API_URL = 'http://localhost:8001/api';
+
+    // ==========================================
+    // 2. LOGIC ẨN / HIỆN CÁC FORM (SPA)
+    // ==========================================
+    const sLogin = document.getElementById('loginSection');
+    const sReg = document.getElementById('registerSection');
+    const sForgot1 = document.getElementById('forgotStep1Section');
+    const sForgot2 = document.getElementById('forgotStep2Section');
+
+    function hideAll() {
+        sLogin.classList.add('hidden');
+        sReg.classList.add('hidden');
+        sForgot1.classList.add('hidden');
+        sForgot2.classList.add('hidden');
+    }
+
+    document.querySelector('.btn-show-register').addEventListener('click', (e) => { e.preventDefault(); hideAll(); sReg.classList.remove('hidden'); });
+    document.querySelector('.btn-show-forgot').addEventListener('click', (e) => { e.preventDefault(); hideAll(); sForgot1.classList.remove('hidden'); });
+    
+    document.querySelectorAll('.btn-back-login').forEach(btn => {
+        btn.addEventListener('click', (e) => { e.preventDefault(); hideAll(); sLogin.classList.remove('hidden'); });
+    });
+
+    // Mở / Ẩn Mật khẩu
+    function togglePass(inputId) {
+        const input = document.getElementById(inputId);
+        const icon = input.nextElementSibling.querySelector('span');
+        if (input.type === "password") {
+            input.type = "text";
+            icon.innerText = "visibility";
+        } else {
+            input.type = "password";
+            icon.innerText = "visibility_off";
+        }
+    }
+
+    // ==========================================
+    // 3. KẾT NỐI API BACKEND GOLANG
+    // ==========================================
+
+    // ĐĂNG NHẬP
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault(); 
+        const btn = document.getElementById('loginBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `<span class="material-symbols-outlined animate-spin">sync</span> ĐANG XÁC THỰC...`; 
+        btn.disabled = true;
+        
+        try {
+            const response = await fetch(`${API_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    username: document.getElementById('loginUsername').value, 
+                    password: document.getElementById('loginPassword').value 
+                })
+            });
+            const data = await response.json();
+            
+            if (response.ok) {
+                // 1. Lưu Token và Role vào trình duyệt
+                const userRole = data.role || 'customer'; // Lấy role từ API, nếu không có thì mặc định là customer
+                
+                if (document.getElementById('rememberMe').checked) {
+                    localStorage.setItem('jwt_token', data.token);
+                    localStorage.setItem('user_role', userRole); 
+                } else {
+                    sessionStorage.setItem('jwt_token', data.token);
+                    sessionStorage.setItem('user_role', userRole);
+                }
+                
+                // 2. TRẠM ĐIỀU HƯỚNG DỰA TRÊN ROLE
+                if (userRole === 'admin') {
+                    window.location.href = 'admin.html';
+                } else if (userRole === 'driver') {
+                    window.location.href = 'driver.html';
+                } else {
+                    window.location.href = 'main.html'; // Customer và những người khác
+                }
+                
+                return; // Ngắt hàm để trình duyệt tập trung chuyển trang
+                
+            } else { 
+                alert('Lỗi: ' + data.error); 
+                btn.innerHTML = originalText; 
+                btn.disabled = false;
+            }
+        } catch (error) { 
+            alert('Mất kết nối tới máy chủ!'); 
+            btn.innerHTML = originalText; 
+            btn.disabled = false;
+        } 
+    });
+
+    // ĐĂNG KÝ
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        e.preventDefault(); 
+        const btn = document.getElementById('registerBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `<span class="material-symbols-outlined animate-spin">sync</span> ĐANG XỬ LÝ...`; 
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(`${API_URL}/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    username: document.getElementById('regUsername').value, 
+                    email: document.getElementById('regEmail').value, 
+                    password: document.getElementById('regPassword').value 
+                })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                alert('Đăng ký thành công! Vui lòng đăng nhập.');
+                document.querySelector('.btn-back-login').click();
+            } else { alert('Lỗi: ' + data.error); }
+        } catch (error) { alert('Mất kết nối tới máy chủ!'); } 
+        finally { btn.innerHTML = originalText; btn.disabled = false; }
+    });
+
+    // QUÊN MẬT KHẨU - BƯỚC 1
+    document.getElementById('forgotFormStep1').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnGetOtp');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `<span class="material-symbols-outlined animate-spin">sync</span> ĐANG GỬI EMAIL...`; 
+        btn.disabled = true;
+
+        try {
+            const res = await fetch(`${API_URL}/forgot-password`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ username: document.getElementById('forgotUsername').value })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                hideAll(); sForgot2.classList.remove('hidden');
+            } else { alert('Lỗi: ' + data.error); }
+        } catch (err) { alert("Lỗi kết nối máy chủ!"); } 
+        finally { btn.innerHTML = originalText; btn.disabled = false; }
+    });
+
+    // QUÊN MẬT KHẨU - BƯỚC 2
+    document.getElementById('forgotFormStep2').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('btnResetPass');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `<span class="material-symbols-outlined animate-spin">sync</span> ĐANG ĐỔI MẬT KHẨU...`; 
+        btn.disabled = true;
+
+        try {
+            const res = await fetch(`${API_URL}/reset-password`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    username: document.getElementById('forgotUsername').value, 
+                    otp: document.getElementById('forgotOtp').value, 
+                    new_password: document.getElementById('forgotNewPassword').value
+                })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert("Đổi mật khẩu thành công! Hãy đăng nhập lại bằng mật khẩu mới.");
+                document.querySelector('.btn-back-login').click(); 
+            } else { alert('Lỗi: ' + data.error); }
+        } catch (err) { alert("Lỗi kết nối máy chủ!"); } 
+        finally { btn.innerHTML = originalText; btn.disabled = false; }
+    });
+</script>
+</body>
+</html>

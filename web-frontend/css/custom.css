@@ -1,0 +1,45 @@
+/* =========================================================
+   GIAO DIỆN TÙY CHỈNH UTH EXPRESS (File Độc Lập)
+   ========================================================= */
+:root {
+    --primary-orange: #FF7300; 
+    --hover-orange: #E66600;
+    --dark-navy: #0A192F;    
+    --light-bg: #f4f7f6;     
+    --input-bg: #ffffff;      
+    --input-border: #e0e0e0;  
+}
+
+body { font-family: 'Inter', sans-serif !important; background: var(--light-bg) !important; color: #333; margin: 0; }
+
+.split-layout { display: flex; min-height: 100vh; flex-wrap: wrap; }
+
+.left-brand { 
+    background: linear-gradient(135deg, #FF8C00 0%, #FF512F 100%); 
+    color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center;
+    position: relative; overflow: hidden;
+}
+.left-brand::after { content: ''; position: absolute; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%); top: -50%; left: -50%; }
+.left-brand h1 { font-weight: 800; font-size: 4rem; letter-spacing: -1px; margin-bottom: 20px; color: #fff; z-index: 1; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+.left-brand p { font-size: 1.2rem; max-width: 450px; line-height: 1.6; font-weight: 600; opacity: 0.95; z-index: 1; }
+
+.right-form { display: flex; justify-content: center; align-items: center; padding: 40px; background: #fff; }
+.login-box { background: #fff !important; padding: 40px !important; border-radius: 20px; width: 100%; max-width: 420px; }
+.login-box h3 { color: var(--dark-navy) !important; font-weight: 800; font-size: 2rem; margin-bottom: 30px !important; }
+
+.form-control { background: var(--input-bg) !important; border: 2px solid var(--input-border) !important; border-radius: 12px !important; color: var(--dark-navy) !important; height: 55px !important; font-weight: 600; font-size: 1rem; padding-left: 20px;}
+.form-control:focus { border-color: var(--primary-orange) !important; background: #fff !important; box-shadow: 0 4px 15px rgba(255, 115, 0, 0.1) !important; }
+.form-control::placeholder { color: #888; font-weight: 500; }
+
+.btn-primary { background: var(--primary-orange) !important; border: none !important; height: 55px; border-radius: 12px !important; font-weight: 700; font-size: 1.1rem; text-transform: none; transition: 0.3s; box-shadow: 0 4px 15px rgba(255, 115, 0, 0.3) !important;}
+.btn-primary:hover { background: var(--hover-orange) !important; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 115, 0, 0.4) !important;}
+
+.btn-outline-light { border: 2px solid var(--primary-orange) !important; color: var(--primary-orange) !important; background: transparent !important; height: 55px; border-radius: 12px !important; font-weight: 700; text-transform: none; transition: 0.3s; }
+.btn-outline-light:hover { background: var(--primary-orange) !important; color: #fff !important; }
+
+.field-icon { color: #888 !important; top: 50% !important; transform: translateY(-50%) !important; right: 20px !important; cursor: pointer;}
+.highlight-text { color: var(--primary-orange); font-weight: 700; text-decoration: none; transition: 0.2s;}
+.highlight-text:hover { color: var(--hover-orange); text-decoration: underline; }
+
+@media (min-width: 768px) { .left-brand { flex: 5; } .right-form { flex: 7; } }
+@media (max-width: 767px) { .left-brand { width: 100%; min-height: 25vh; } .right-form { width: 100%; min-height: 75vh; } .left-brand h1 { font-size: 2.5rem; } }

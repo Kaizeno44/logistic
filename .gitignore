@@ -1,0 +1,6 @@
+# Bỏ qua két sắt chứa mật khẩu
+.env
+
+# Bỏ qua thư mục build của Go (nếu có)
+/order-service/order-service
+/driver-service/driver-service

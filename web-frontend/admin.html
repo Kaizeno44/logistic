@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html class="light" lang="vi">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Admin Dashboard | UTH Express</title>
+    
+    <script>
+        const token = localStorage.getItem('jwt_token') || sessionStorage.getItem('jwt_token');
+        const role = localStorage.getItem('user_role') || sessionStorage.getItem('user_role');
+        // Nếu không có Token hoặc Role không phải là 'admin', đá văng ra ngoài
+        if (!token || role !== 'admin') {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+    
+    <script id="tailwind-config">
+        tailwind.config = { darkMode: "class", theme: { extend: { colors: { "inverse-primary": "#ffb599", "tertiary-container": "#261906", "tertiary-fixed": "#f9debf", "surface-container-highest": "#dce2f7", "inverse-on-surface": "#edf0ff", "inverse-surface": "#293040", "surface-container": "#e9edff", "surface-variant": "#dce2f7", "surface-container-high": "#e1e8fd", "primary-container": "#370e00", "on-tertiary-container": "#968065", "on-error": "#ffffff", "primary": "#000000", "on-primary-container": "#e05814", "on-tertiary-fixed": "#261906", "on-secondary": "#ffffff", "on-primary": "#ffffff", "tertiary": "#000000", "secondary": "#575e70", "on-surface-variant": "#45464c", "surface-container-lowest": "#ffffff", "surface": "#f9f9ff", "background": "#f9f9ff", "on-tertiary-fixed-variant": "#55442d", "surface-dim": "#d3daef", "primary-fixed": "#ffdbce", "on-tertiary": "#ffffff", "on-surface": "#141b2b", "tertiary-fixed-dim": "#dcc2a4", "surface-bright": "#f9f9ff", "on-error-container": "#93000a", "on-primary-fixed-variant": "#7f2b00", "on-secondary-container": "#5c6274", "on-secondary-fixed": "#141b2b", "secondary-fixed": "#dce2f7", "secondary-fixed-dim": "#c0c6db", "primary-fixed-dim": "#ffb599", "on-primary-fixed": "#370e00", "outline-variant": "#c6c6cd", "surface-tint": "#a63b00", "outline": "#76777d", "error-container": "#ffdad6", "error": "#ba1a1a", "surface-container-low": "#f1f3ff", "on-secondary-fixed-variant": "#404758", "secondary-container": "#d9dff5", "on-background": "#141b2b" }, borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, fontFamily: { "headline": ["Inter"], "body": ["Inter"], "label": ["Inter"] } } } }
+    </script>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+    <div class="flex min-h-screen">
+        
+        <aside class="flex flex-col h-screen sticky top-0 left-0 h-full w-64 bg-slate-50 dark:bg-slate-900 font-sans tracking-tight font-medium">
+            <div class="p-8 flex flex-col gap-1">
+                <div class="flex items-center gap-2 mb-8">
+                    <div class="w-8 h-8 rounded-xl bg-on-primary-container flex items-center justify-center text-white">
+                        <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">bolt</span>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-black tracking-tighter text-slate-900 dark:text-white leading-none">KINETIC</h1>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Admin Command Center</p>
+                    </div>
+                </div>
+                <nav class="space-y-1">
+                    <a class="flex items-center gap-3 px-4 py-3 text-orange-600 dark:text-orange-500 font-bold border-r-4 border-orange-600 bg-slate-100 dark:bg-slate-800 transition-all duration-150" href="#">
+                        <span class="material-symbols-outlined">dashboard</span> <span>Dashboard</span>
+                    </a>
+                    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 transition-colors" href="#">
+                        <span class="material-symbols-outlined">local_shipping</span> <span>Orders</span>
+                    </a>
+                    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 transition-colors" href="#">
+                        <span class="material-symbols-outlined">hub</span> <span>RabbitMQ Monitor</span>
+                    </a>
+                </nav>
+            </div>
+            
+            <div class="mt-auto p-8">
+                <button onclick="logout()" class="w-full bg-red-50 hover:bg-red-100 text-red-600 font-bold py-3 rounded-xl transition-colors border border-red-100 flex items-center justify-center gap-2">
+                    <span class="text-sm">Đăng xuất</span>
+                    <span class="material-symbols-outlined">logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-surface">
+            <header class="w-full h-16 sticky top-0 z-50 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl flex justify-between items-center px-8 shadow-sm">
+                <div class="flex items-center gap-4 flex-1">
+                    <div class="relative max-w-md w-full">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+                        <input class="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-xl pl-10 py-2 text-sm focus:ring-0" placeholder="Search Command Center..." type="text"/>
+                    </div>
+                </div>
+                <div class="flex items-center gap-6">
+                    <div class="text-right">
+                        <p class="text-xs font-bold text-slate-900 leading-none">Admin UTH</p>
+                        <p class="text-[10px] text-slate-500">Superuser</p>
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-8 space-y-8">
+                <div class="flex justify-between items-end">
+                    <div>
+                        <h2 class="text-3xl font-extrabold tracking-tight text-on-surface">System Performance</h2>
+                        <p class="text-on-surface-variant font-medium mt-1">Real-time asynchronous logistics monitoring</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/10 shadow-sm">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Tổng đơn hệ thống</p>
+                        <h3 id="admin-total-orders" class="text-3xl font-black text-slate-800 mt-2">0</h3>
+                    </div>
+                    <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/10 shadow-sm">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Đang chờ xử lý (Queue)</p>
+                        <div class="flex items-center gap-3 mt-2">
+                            <h3 id="admin-pending-orders" class="text-3xl font-black text-orange-600">0</h3>
+                            <span class="w-2 h-2 bg-orange-600 rounded-full animate-pulse"></span>
+                        </div>
+                    </div>
+                    <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/10 shadow-sm">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Đơn đã hoàn thành</p>
+                        <div class="flex items-center gap-3 mt-2">
+                            <h3 id="admin-completed-orders" class="text-3xl font-black text-green-600">0</h3>
+                            <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                        </div>
+                    </div>
+                    <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/10 shadow-sm">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Doanh thu ước tính</p>
+                        <h3 class="text-2xl font-black text-on-surface tracking-tight mt-2"><span id="admin-revenue">0</span> <span class="text-sm font-medium">VND</span></h3>
+                    </div>
+                </div>
+
+                <div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm border border-outline-variant/10">
+                    <div class="px-8 py-6 border-b border-outline-variant/15 flex justify-between items-center">
+                        <h3 class="text-lg font-bold text-on-surface">Luồng điều phối Real-time</h3>
+                        <div class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-black uppercase flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></span> Live Sync
+                        </div>
+                    </div>
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-100">
+                                <th class="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Mã đơn</th>
+                                <th class="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Trạng thái</th>
+                                <th class="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Tuyến đường</th>
+                                <th class="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Thời gian</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-recent-orders-table" class="divide-y divide-outline-variant/10">
+                            <tr><td colspan="4" class="text-center py-6 text-slate-500 animate-pulse">Đang tải dữ liệu...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8001';
+
+        function logout() {
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        async function fetchAdminDashboard() {
+            try {
+                const res = await fetch(`${API_URL}/api/admin/dashboard`, {
+                    method: 'GET',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    // Cập nhật số liệu KPI
+                    document.getElementById('admin-total-orders').innerText = data.total_orders;
+                    document.getElementById('admin-pending-orders').innerText = data.pending_orders;
+                    document.getElementById('admin-completed-orders').innerText = data.completed_orders;
+                    document.getElementById('admin-revenue').innerText = data.revenue.toLocaleString('vi-VN');
+
+                    // Cập nhật bảng Danh sách đơn
+                    let tableHTML = '';
+                    if (data.recent_orders.length === 0) {
+                        tableHTML = `<tr><td colspan="4" class="text-center py-6 text-slate-500">Chưa có đơn hàng nào.</td></tr>`;
+                    } else {
+                        data.recent_orders.forEach(order => {
+                            let statusBadge = '';
+                            if (order.status === 'PENDING') {
+                                statusBadge = `<span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-[10px] font-black uppercase">PENDING</span>`;
+                            } else if (order.status === 'MATCHED') {
+                                statusBadge = `<span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-[10px] font-black uppercase">MATCHED</span>`;
+                            } else if (order.status === 'COMPLETED') {
+                                statusBadge = `<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-[10px] font-black uppercase">COMPLETED</span>`;
+                            } else {
+                                statusBadge = `<span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-[10px] font-black uppercase">${order.status}</span>`;
+                            }
+
+                            let dateStr = new Date(order.created_at).toLocaleTimeString('vi-VN');
+
+                            tableHTML += `
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-8 py-5 text-sm font-bold text-slate-800">${order.tracking_code}</td>
+                                <td class="px-8 py-5">${statusBadge}</td>
+                                <td class="px-8 py-5">
+                                    <div class="text-xs font-semibold text-slate-700 truncate max-w-[250px]">${order.pickup_address}</div>
+                                    <div class="text-[10px] text-slate-400 mt-1">➔ ${order.delivery_address}</div>
+                                </td>
+                                <td class="px-8 py-5 text-xs text-slate-500 font-medium">${dateStr}</td>
+                            </tr>
+                            `;
+                        });
+                    }
+                    document.getElementById('admin-recent-orders-table').innerHTML = tableHTML;
+                }
+            } catch (error) {
+                console.error("Lỗi cập nhật Dashboard:", error);
+            }
+        }
+
+        // Khởi chạy ngay và lặp lại mỗi 3 giây
+        fetchAdminDashboard();
+        setInterval(fetchAdminDashboard, 3000);
+    </script>
+</body>
+</html>

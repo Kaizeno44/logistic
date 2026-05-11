@@ -1,0 +1,110 @@
+services:
+  # ==========================================
+  # PHẦN 1: HẠ TẦNG CƠ SỞ (INFRASTRUCTURE)
+  # ==========================================
+  
+  # 1. Cơ sở dữ liệu PostgreSQL
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: logistics_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_DB: logistics_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Lưu lại data khi tắt container
+
+  # 2. Hệ thống Cache Redis
+  redis-cache:
+    image: redis:alpine
+    container_name: logistics_redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  # 3. Message Queue RabbitMQ (Trọng tâm đồ án)
+  rabbitmq-broker:
+    image: rabbitmq:3-management-alpine
+    container_name: logistics_rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"   # Port giao tiếp mặc định cho ứng dụng Go
+      - "15672:15672" # Port giao diện quản lý trên trình duyệt (Dashboard)
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  # ==========================================
+  # PHẦN 2: CÁC MICROSERVICES CỦA ANH
+  # ==========================================
+
+  order-service:
+    build: 
+      context: ./order-service
+      dockerfile: Dockerfile
+    container_name: order_api
+    restart: always
+    ports:
+      - "8001:8001"
+    depends_on:
+      - postgres-db
+      - rabbitmq-broker
+      - redis-cache
+    environment: # Truyền biến môi trường cho Go đọc
+      - SERVER_PORT=8001
+      - DB_DSN=host=postgres-db user=root password=secretpassword dbname=logistics_db port=5432 sslmode=disable TimeZone=Asia/Ho_Chi_Minh
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq-broker:5672/
+      - REDIS_HOST=redis-cache:6379
+      - SMTP_EMAIL=${SMTP_EMAIL}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+
+  driver-service:
+    build: 
+      context: ./driver-service
+      dockerfile: Dockerfile
+    container_name: driver_api
+    restart: always
+    ports:
+      - "8002:8002"
+    depends_on:
+      - postgres-db     # ĐÃ THÊM: Bắt buộc chờ DB khởi động
+      - redis-cache
+      - rabbitmq-broker
+    environment:
+      - SERVER_PORT=8002
+      - REDIS_HOST=redis-cache:6379
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq-broker:5672/
+      # ĐÃ SỬA: Đồng bộ user=root, password=secretpassword, host=postgres-db giống hệt order-service
+      - DB_DSN=host=postgres-db user=root password=secretpassword dbname=logistics_db port=5432 sslmode=disable TimeZone=Asia/Ho_Chi_Minh
+
+  notification-service:
+    build: 
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: notification_worker
+    restart: always
+    ports:
+      - "8003:8003"
+    depends_on:
+      - rabbitmq-broker
+    environment:
+      - SERVER_PORT=8003
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq-broker:5672/
+      - SMTP_EMAIL=${SMTP_EMAIL}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+
+  web-frontend:
+    build: 
+      context: ./web-frontend
+      dockerfile: Dockerfile
+    container_name: logistics_web_ui
+    restart: always
+    ports:
+      - "80:80" # Trình duyệt mặc định chạy cổng 80
+
+# Định nghĩa volume để lưu trữ dữ liệu bền vững
+volumes:
+  postgres_data:
+  rabbitmq_data:

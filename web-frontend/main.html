@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>📦 Đặt đơn hàng nội thành | UTH Express</title>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary-container": "#e05814",
+                        "surface-container-highest": "#dce2f7",
+                        "on-background": "#141b2b",
+                        "inverse-surface": "#293040",
+                        "surface-container-high": "#e1e8fd",
+                        "outline": "#76777d",
+                        "surface-container-low": "#f1f3ff",
+                        "surface-variant": "#dce2f7",
+                        "on-secondary-container": "#5c6274",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#c6c6cd",
+                        "surface": "#f9f9ff",
+                        "on-surface": "#141b2b",
+                    },
+                    fontFamily: { "headline": ["Inter"], "body": ["Inter"], "label": ["Inter"] }
+                },
+            },
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col">
+
+    <script>
+        const token = localStorage.getItem('jwt_token') || sessionStorage.getItem('jwt_token');
+        if (!token) { window.location.href = 'index.html'; }
+    </script>
+
+    <header class="w-full top-0 sticky z-50 bg-slate-50 shadow-sm border-b border-slate-200">
+        <nav class="flex justify-between items-center w-full px-6 py-3">
+            <div class="flex items-center gap-8">
+                <span class="text-xl font-black italic tracking-tighter text-slate-900">UTH Express</span>
+                <div class="hidden md:flex items-center gap-6">
+                    <a href="main.html" class="text-orange-600 font-bold border-b-2 border-orange-600 py-1">Điều phối đơn</a>
+                    <a href="history.html" class="text-slate-500 hover:text-slate-800 py-1 font-semibold transition-colors">Lịch sử</a>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <button id="btnLogout" class="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-red-50 hover:text-red-600 transition-colors text-slate-500">
+                    <span class="text-xs font-bold uppercase tracking-widest">Đăng xuất</span>
+                    <span class="material-symbols-outlined text-lg">logout</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="flex-grow w-full max-w-7xl mx-auto px-6 py-10">
+        <header class="mb-12">
+            <h1 class="text-4xl font-black tracking-tight text-on-surface mb-2">📦 Lên Đơn Hàng Mới</h1>
+            <p class="text-slate-500 font-medium">Hệ thống phân bổ tài xế tự động qua RabbitMQ Queue</p>
+        </header>
+
+        <form id="orderForm">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 space-y-8">
+                    
+                    <section class="bg-surface-container-lowest rounded-xl p-8 shadow-sm border border-slate-200">
+                        <div class="flex items-center gap-3 mb-8">
+                            <div class="w-2 h-2 rounded-full bg-on-primary-container"></div>
+                            <h2 class="text-xl font-bold tracking-tight">Khu Vực Giao Nhận (Zone-based)</h2>
+                        </div>
+                        
+                        <div class="space-y-10">
+                            <div>
+                                <div class="flex items-center gap-2 mb-4 text-xs font-bold uppercase tracking-widest text-slate-500">
+                                    <span class="material-symbols-outlined text-sm text-blue-600">location_on</span> ĐIỂM LẤY HÀNG
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] font-bold uppercase tracking-widest text-outline">Tỉnh/Thành phố</label>
+                                        <select class="w-full bg-surface-container-low border-none rounded-lg text-sm font-medium py-3 px-4 outline-none" disabled>
+                                            <option>Hồ Chí Minh</option>
+                                        </select>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] font-bold uppercase tracking-widest text-outline">Quận/Huyện</label>
+                                        <select id="pickupDistrict" class="w-full bg-surface-container-low border-none rounded-lg text-sm font-medium py-3 px-4 outline-none focus:ring-2 focus:ring-on-primary-container" onchange="loadWards('pickup')" required>
+                                            <option value="">-- Chọn Quận --</option>
+                                        </select>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] font-bold uppercase tracking-widest text-outline">Phường/Xã</label>
+                                        <select id="pickupWard" class="w-full bg-surface-container-low border-none rounded-lg text-sm font-medium py-3 px-4 outline-none focus:ring-2 focus:ring-on-primary-container" required disabled>
+                                            <option value="">-- Phường/Xã --</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mt-4 space-y-1">
+                                    <label class="text-[10px] font-bold uppercase tracking-widest text-outline">Số nhà, Tên đường</label>
+                                    <input id="pickupAddress" class="w-full bg-surface-container-low border-none rounded-lg text-sm py-3 px-4 focus:ring-2 focus:ring-on-primary-container outline-none" placeholder="VD: 120 Tô Ký..." type="text" required/>
+                                </div>
+                                <div class="mt-4 grid grid-cols-2 gap-4 bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+                                        <div class="space-y-1">
+                                            <label class="text-[10px] font-bold uppercase tracking-widest text-blue-800">Tên người gửi</label>
+                                            <input id="senderName" class="w-full bg-white border-none rounded-lg text-sm py-2 px-3 focus:ring-2 focus:ring-blue-400 outline-none" placeholder="Tên người gửi" type="text"/>
+                                        </div>
+                                        <div class="space-y-1">
+                                            <label class="text-[10px] font-bold uppercase tracking-widest text-blue-800">SĐT Người gửi *</label>
+                                            <input id="senderPhone" class="w-full bg-white border-none rounded-lg text-sm py-2 px-3 focus:ring-2 focus:ring-blue-400 outline-none" placeholder="090123..." type="tel" required/>
+                                        </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-6 border-t border-slate-100">
+                                <div class="flex items-center gap-2 mb-4 text-xs font-bold uppercase tracking-widest text-slate-500">
+                                    <span class="material-symbols-outlined text-sm text-orange-500">local_shipping</span> ĐIỂM GIAO HÀNG
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] font-bold uppercase tracking-widest text-outline">Tỉnh/Thành phố</label>
+                                        <select class="w-full bg-surface-container-low border-none rounded-lg text-sm font-medium py-3 px-4 outline-none" disabled>
+                                            <option>Hồ Chí Minh</option>
+                                        </select>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] font-bold uppercase tracking-widest text-outline">Quận/Huyện</label>
+                                        <select id="deliveryDistrict" class="w-full bg-surface-container-low border-none rounded-lg text-sm font-medium py-3 px-4 outline-none focus:ring-2 focus:ring-on-primary-container" onchange="loadWards('delivery')" required>
+                                            <option value="">-- Chọn Quận --</option>
+                                        </select>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] font-bold uppercase tracking-widest text-outline">Phường/Xã</label>
+                                        <select id="deliveryWard" class="w-full bg-surface-container-low border-none rounded-lg text-sm font-medium py-3 px-4 outline-none focus:ring-2 focus:ring-on-primary-container" required disabled>
+                                            <option value="">-- Phường/Xã --</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mt-4 space-y-1">
+                                    <label class="text-[10px] font-bold uppercase tracking-widest text-outline">Số nhà, Tên đường</label>
+                                    <input id="deliveryAddress" class="w-full bg-surface-container-low border-none rounded-lg text-sm py-3 px-4 focus:ring-2 focus:ring-on-primary-container outline-none" placeholder="VD: Số 2 Võ Oanh..." type="text" required/>
+                                </div>
+                                <div class="mt-4 grid grid-cols-2 gap-4 bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] font-bold uppercase tracking-widest text-blue-800">Tên người nhận</label>
+                                        <input id="receiverName" class="w-full bg-white border-none rounded-lg text-sm py-2 px-3 focus:ring-2 focus:ring-blue-400 outline-none" placeholder="Tên người nhận" type="text"/>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="text-[10px] font-bold uppercase tracking-widest text-blue-800">SĐT Người nhận *</label>
+                                        <input id="receiverPhone" class="w-full bg-white border-none rounded-lg text-sm py-2 px-3 focus:ring-2 focus:ring-blue-400 outline-none" placeholder="098765..." type="tel" required/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="bg-surface-container-lowest rounded-xl p-8 shadow-sm border border-slate-200">
+                        <div class="flex items-center gap-3 mb-8">
+                            <div class="w-2 h-2 rounded-full bg-on-primary-container"></div>
+                            <h2 class="text-xl font-bold tracking-tight">Chi Tiết Hàng Hóa</h2>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                            <div>
+                                <label class="text-[10px] font-bold uppercase tracking-widest text-outline block mb-4">Loại hàng hóa (Phân loại xe)</label>
+                                <div class="flex flex-wrap gap-2" id="typeContainer">
+                                    <button type="button" class="type-btn active px-4 py-2 rounded-xl bg-on-primary-container text-white text-sm font-bold transition-all">Thời trang</button>
+                                    <button type="button" class="type-btn px-4 py-2 rounded-xl bg-surface-container-high text-on-secondary-container text-sm font-bold hover:bg-slate-200 transition-all">Mỹ phẩm</button>
+                                    <button type="button" class="type-btn px-4 py-2 rounded-xl bg-surface-container-high text-on-secondary-container text-sm font-bold hover:bg-slate-200 transition-all">Thực phẩm</button>
+                                    <button type="button" class="type-btn px-4 py-2 rounded-xl bg-surface-container-high text-on-secondary-container text-sm font-bold hover:bg-slate-200 transition-all">Điện tử</button>
+                                    <button type="button" class="type-btn px-4 py-2 rounded-xl bg-surface-container-high text-on-secondary-container text-sm font-bold hover:bg-slate-200 transition-all">Khác</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold uppercase tracking-widest text-outline block mb-4">Khối lượng (kg)</label>
+                                <div class="flex items-center bg-surface-container-low rounded-xl px-4 py-2 focus-within:ring-2 focus-within:ring-on-primary-container">
+                                    <input id="weight" class="bg-transparent border-none w-full text-xl font-bold focus:ring-0 outline-none" step="0.5" min="0.5" type="number" value="1.0" required/>
+                                    <span class="text-slate-400 font-bold ml-2">KG</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="bg-surface-container-lowest rounded-xl p-8 shadow-sm border border-slate-200">
+                        <div class="flex items-center gap-3 mb-8">
+                            <div class="w-2 h-2 rounded-full bg-on-primary-container"></div>
+                            <h2 class="text-xl font-bold tracking-tight">Dịch Vụ Thêm & Ghi Chú</h2>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
+                                <div>
+                                    <p class="text-sm font-bold text-slate-800">Giao hàng dễ vỡ</p>
+                                    <p class="text-[10px] uppercase tracking-wider text-outline">+ 10.000đ</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer addon-checkbox" data-price="10000"/>
+                                    <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-on-primary-container"></div>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
+                                <div>
+                                    <p class="text-sm font-bold text-slate-800">Giao tận cửa / Lên lầu</p>
+                                    <p class="text-[10px] uppercase tracking-wider text-outline">+ 5.000đ</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer addon-checkbox" data-price="5000"/>
+                                    <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-on-primary-container"></div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold uppercase tracking-widest text-outline">Ghi chú cho tài xế</label>
+                            <textarea id="driverNote" class="w-full bg-surface-container-low border-none rounded-xl text-sm p-4 focus:ring-2 focus:ring-on-primary-container outline-none" placeholder="Ví dụ: Gọi điện cho người nhận trước khi tới 5 phút..." rows="2"></textarea>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="lg:col-span-1">
+                    <div class="sticky top-24 space-y-6">
+                        <div class="bg-slate-900 text-white rounded-2xl overflow-hidden shadow-2xl">
+                            <div class="p-8">
+                                <div class="flex justify-between items-start mb-8">
+                                    <div>
+                                        <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-1">Queue Status</p>
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                            <span class="text-sm font-bold text-green-400">[HỆ THỐNG SẴN SÀNG]</span>
+                                        </div>
+                                    </div>
+                                    <span class="material-symbols-outlined text-slate-500">bolt</span>
+                                </div>
+                                <div class="mb-10">
+                                    <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">TỔNG CƯỚC DỰ KIẾN</p>
+                                    <div class="text-5xl font-black tracking-tighter text-on-primary-container flex items-baseline gap-1">
+                                        <span id="priceDisplay">0</span>
+                                        <span class="text-xl font-bold uppercase tracking-widest text-slate-500">VND</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button id="btnCreateOrder" type="submit" class="w-full bg-on-primary-container hover:bg-orange-700 text-white font-black py-6 px-8 flex items-center justify-center gap-3 transition-colors active:scale-[0.98]">
+                                <span>TẠO ĐƠN & TÌM TÀI XẾ</span>
+                                <span class="material-symbols-outlined">send</span>
+                            </button>
+                        </div>
+
+                        <div class="bg-surface-container-low rounded-xl p-6 border border-slate-200">
+                            <h4 class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Cam kết dịch vụ</h4>
+                            <div class="space-y-4">
+                                <div class="flex gap-4">
+                                    <span class="material-symbols-outlined text-on-primary-container bg-orange-100 p-2 rounded-lg text-lg">schedule</span>
+                                    <div>
+                                        <p class="text-xs font-bold">Thuật toán Matching Real-time</p>
+                                        <p class="text-[10px] text-slate-500">Tìm tài xế phù hợp trong vài giây qua RabbitMQ.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        const API_URL = 'http://localhost:8001';
+
+        // 1. TẢI DỮ LIỆU QUẬN TỪ BACKEND
+        window.onload = async function() {
+            try {
+                const res = await fetch(`${API_URL}/api/districts`);
+                const districts = await res.json();
+                let html = '<option value="">-- Chọn Quận/Huyện --</option>';
+                districts.forEach(d => { html += `<option value="${d.id}">${d.name}</option>`; });
+                document.getElementById('pickupDistrict').innerHTML = html;
+                document.getElementById('deliveryDistrict').innerHTML = html;
+            } catch (error) {
+                console.error("Lỗi tải Quận:", error);
+            }
+        };
+
+        // 2. TẢI DỮ LIỆU PHƯỜNG KHI CHỌN QUẬN
+        async function loadWards(type) {
+            const districtId = document.getElementById(type + 'District').value;
+            const wardSelect = document.getElementById(type + 'Ward');
+            wardSelect.innerHTML = '<option value="">-- Đang tải... --</option>';
+            wardSelect.disabled = true;
+
+            if (!districtId) { wardSelect.innerHTML = '<option value="">-- Phường/Xã --</option>'; return; }
+
+            try {
+                const res = await fetch(`${API_URL}/api/districts/${districtId}/wards`);
+                const wards = await res.json();
+                let html = '<option value="">-- Chọn Phường/Xã --</option>';
+                wards.forEach(w => { html += `<option value="${w.id}">${w.name}</option>`; });
+                wardSelect.innerHTML = html;
+                wardSelect.disabled = false;
+            } catch (error) { console.error("Lỗi tải Phường:", error); }
+        }
+
+        // 3. XỬ LÝ TÍNH TIỀN (PRICING ENGINE CHUẨN LOGISTICS)
+        function calculateTotalPrice() {
+            let total = 0;
+
+            // Lấy giá trị đầu vào
+            const pickupDistrict = document.getElementById('pickupDistrict').value;
+            const deliveryDistrict = document.getElementById('deliveryDistrict').value;
+            const weight = parseFloat(document.getElementById('weight').value) || 0;
+
+            // A. PHÍ CƠ BẢN (Theo Zone)
+            if (pickupDistrict && deliveryDistrict) {
+                if (pickupDistrict === deliveryDistrict) {
+                    total += 15000; // Cùng quận: 15k
+                } else {
+                    total += 25000; // Khác quận: 25k
+                }
+            } else {
+                total += 15000; // Mặc định hiển thị ban đầu
+            }
+
+            // B. PHÍ CÂN NẶNG (Miễn phí 3kg đầu, sau đó +5k/kg)
+            if (weight > 3) {
+                const extraWeight = weight - 3;
+                total += Math.ceil(extraWeight) * 5000; 
+            }
+
+            // C. PHÍ DỊCH VỤ THÊM (Add-ons)
+            document.querySelectorAll('.addon-checkbox:checked').forEach(cb => {
+                total += parseInt(cb.getAttribute('data-price'), 10);
+            });
+
+            // Hiển thị ra màn hình định dạng số (VD: 25.000)
+            document.getElementById('priceDisplay').innerText = total.toLocaleString('vi-VN');
+        }
+
+        // Lắng nghe sự kiện để tính lại tiền ngay lập tức
+        document.getElementById('pickupDistrict').addEventListener('change', calculateTotalPrice);
+        document.getElementById('deliveryDistrict').addEventListener('change', calculateTotalPrice);
+        document.getElementById('weight').addEventListener('input', calculateTotalPrice);
+        document.querySelectorAll('.addon-checkbox').forEach(cb => {
+            cb.addEventListener('change', calculateTotalPrice);
+        });
+
+        // Tính lần đầu khi vừa mở trang
+        calculateTotalPrice();
+
+        // 4. XỬ LÝ NÚT CHỌN LOẠI HÀNG (Màu sắc của Tailwind)
+        document.querySelectorAll('.type-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Xóa trạng thái active của tất cả các nút
+                document.querySelectorAll('.type-btn').forEach(b => {
+                    b.classList.remove('bg-on-primary-container', 'text-white', 'active');
+                    b.classList.add('bg-surface-container-high', 'text-on-secondary-container');
+                });
+                // Kích hoạt nút vừa bấm
+                this.classList.remove('bg-surface-container-high', 'text-on-secondary-container');
+                this.classList.add('bg-on-primary-container', 'text-white', 'active');
+            });
+        });
+
+        // ĐĂNG XUẤT
+        document.getElementById('btnLogout').addEventListener('click', () => { 
+            localStorage.clear(); sessionStorage.clear(); window.location.href = 'index.html'; 
+        });
+
+        // 5. GỬI ĐƠN HÀNG XUỐNG API (RABBITMQ)
+        document.getElementById('orderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnCreateOrder');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> <span>ĐANG ĐẨY VÀO HÀNG ĐỢI...</span>'; 
+            btn.disabled = true;
+
+            // Lấy loại hàng hóa đang được chọn (nút có class 'active')
+            const activeTypeBtn = document.querySelector('.type-btn.active');
+            const itemType = activeTypeBtn ? activeTypeBtn.innerText : "Khác";
+
+            const orderPayload = {
+                item_type: itemType,
+                weight: parseFloat(document.getElementById('weight').value) || 1,
+                
+                pickup_district_id: parseInt(document.getElementById('pickupDistrict').value),
+                pickup_ward_id: parseInt(document.getElementById('pickupWard').value),
+                pickup_address: document.getElementById('pickupAddress').value,
+                
+                delivery_district_id: parseInt(document.getElementById('deliveryDistrict').value),
+                delivery_ward_id: parseInt(document.getElementById('deliveryWard').value),
+                delivery_address: document.getElementById('deliveryAddress').value,
+                sender_name: document.getElementById('senderName').value,
+                sender_phone: document.getElementById('senderPhone').value,
+                receiver_name: document.getElementById('receiverName').value,
+                receiver_phone: document.getElementById('receiverPhone').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/api/orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify(orderPayload)
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert(`✅ Tạo đơn thành công!\n📦 Tracking Code: ${data.data.tracking_code}\n🚀 RabbitMQ đang phân bổ tài xế phù hợp!`);
+                    window.location.href = 'history.html';
+                } else { alert('❌ Lỗi tạo đơn: ' + data.error); }
+            } catch (error) { 
+                alert('⚠️ Mất kết nối tới Order Service!'); 
+            } finally { 
+                btn.innerHTML = originalHTML; btn.disabled = false; 
+            }
+        });
+    </script>
+</body>
+</html>
