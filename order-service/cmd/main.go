@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"net/url"
 
 	//"net/smtp"
 	"os"
@@ -368,6 +369,99 @@ func main() {
 			})
 		})
 		// ==========================================
+
+		// ==========================================
+		// API 5.4: ADMIN QUẢN LÝ ĐƠN HÀNG (Lấy tất cả đơn)
+		// ==========================================
+		protected.GET("/admin/orders", middlewares.AdminAuth(), func(c *gin.Context) {
+			var orders []models.Order
+			if err := db.Order("created_at desc").Find(&orders).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Không thể lấy danh sách đơn hàng"})
+				return
+			}
+			c.JSON(http.StatusOK, orders)
+		})
+
+		// ==========================================
+		// API 5.5: ADMIN QUẢN LÝ TÀI XẾ
+		// ==========================================
+		protected.GET("/admin/drivers", middlewares.AdminAuth(), func(c *gin.Context) {
+			type DriverResponse struct {
+				ID       uint   `json:"id"`
+				Username string `json:"username"`
+				Email    string `json:"email"`
+				Status   string `json:"status"`
+			}
+			var results []DriverResponse
+			err := db.Table("users").
+				Select("users.id, users.username, users.email, COALESCE(drivers.status, 'OFFLINE') as status").
+				Joins("LEFT JOIN drivers ON drivers.user_id = users.id").
+				Where("users.role = ?", "driver").
+				Scan(&results).Error
+
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Không thể lấy danh sách tài xế"})
+				return
+			}
+			c.JSON(http.StatusOK, results)
+		})
+
+		// ==========================================
+		// API 5.6: ADMIN RABBITMQ STATS PROXY
+		// ==========================================
+		protected.GET("/admin/rabbitmq/stats", middlewares.AdminAuth(), func(c *gin.Context) {
+			rabbitURLParsed, err := url.Parse(os.Getenv("RABBITMQ_URL"))
+			rabbitHost := "rabbitmq-broker"
+			if err == nil && rabbitURLParsed.Hostname() != "" {
+				rabbitHost = rabbitURLParsed.Hostname()
+			}
+
+			client := &http.Client{Timeout: 5 * time.Second}
+			req, err := http.NewRequest("GET", fmt.Sprintf("http://%s:15672/api/queues", rabbitHost), nil)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi tạo request RabbitMQ"})
+				return
+			}
+			req.SetBasicAuth("guest", "guest")
+
+			resp, err := client.Do(req)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi kết nối đến RabbitMQ Management API: " + err.Error()})
+				return
+			}
+			defer resp.Body.Close()
+
+			var stats interface{}
+			if err := json.NewDecoder(resp.Body).Decode(&stats); err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi giải mã dữ liệu RabbitMQ"})
+				return
+			}
+
+			c.JSON(http.StatusOK, stats)
+		})
+		// ==========================================
+		// API: ADMIN KHÓA TÀI KHOẢN TÀI XẾ
+		// ==========================================
+		protected.PUT("/admin/drivers/:id/lock", middlewares.AdminAuth(), func(c *gin.Context) {
+			driverID := c.Param("id")
+
+			// Đổi Role của tài xế thành "locked" để tước quyền đăng nhập
+			result := db.Model(&models.User{}).
+				Where("id = ? AND role = ?", driverID, "driver").
+				Update("role", "locked")
+
+			if result.Error != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi hệ thống khi khóa tài khoản!"})
+				return
+			}
+
+			if result.RowsAffected == 0 {
+				c.JSON(http.StatusNotFound, gin.H{"error": "Không tìm thấy tài xế này hoặc đã bị khóa!"})
+				return
+			}
+
+			c.JSON(http.StatusOK, gin.H{"message": "Đã khóa tài xế thành công!"})
+		})
 
 		// ==========================================
 		// API 5.6: XEM CHI TIẾT 1 ĐƠN HÀNG (MỚI THÊM)

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html class="light" lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Orders Management | UTH Express</title>
+
+    <script>
+        const token = localStorage.getItem('jwt_token') || sessionStorage.getItem('jwt_token');
+        const role = localStorage.getItem('user_role') || sessionStorage.getItem('user_role');
+        // Nếu không có Token hoặc Role không phải là 'admin', đá văng ra ngoài
+        if (!token || role !== 'admin') {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+
+    <script id="tailwind-config">
+        tailwind.config = { darkMode: "class", theme: { extend: { colors: { "inverse-primary": "#ffb599", "tertiary-container": "#261906", "tertiary-fixed": "#f9debf", "surface-container-highest": "#dce2f7", "inverse-on-surface": "#edf0ff", "inverse-surface": "#293040", "surface-container": "#e9edff", "surface-variant": "#dce2f7", "surface-container-high": "#e1e8fd", "primary-container": "#370e00", "on-tertiary-container": "#968065", "on-error": "#ffffff", "primary": "#000000", "on-primary-container": "#e05814", "on-tertiary-fixed": "#261906", "on-secondary": "#ffffff", "on-primary": "#ffffff", "tertiary": "#000000", "secondary": "#575e70", "on-surface-variant": "#45464c", "surface-container-lowest": "#ffffff", "surface": "#f9f9ff", "background": "#f9f9ff", "on-tertiary-fixed-variant": "#55442d", "surface-dim": "#d3daef", "primary-fixed": "#ffdbce", "on-tertiary": "#ffffff", "on-surface": "#141b2b", "tertiary-fixed-dim": "#dcc2a4", "surface-bright": "#f9f9ff", "on-error-container": "#93000a", "on-primary-fixed-variant": "#7f2b00", "on-secondary-container": "#5c6274", "on-secondary-fixed": "#141b2b", "secondary-fixed": "#dce2f7", "secondary-fixed-dim": "#c0c6db", "primary-fixed-dim": "#ffb599", "on-primary-fixed": "#370e00", "outline-variant": "#c6c6cd", "surface-tint": "#a63b00", "outline": "#76777d", "error-container": "#ffdad6", "error": "#ba1a1a", "surface-container-low": "#f1f3ff", "on-secondary-fixed-variant": "#404758", "secondary-container": "#d9dff5", "on-background": "#141b2b" }, borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, fontFamily: { "headline": ["Inter"], "body": ["Inter"], "label": ["Inter"] } } } }
+    </script>
+</head>
+
+<body class="bg-surface text-on-surface antialiased">
+    <div class="flex min-h-screen">
+
+        <aside
+            class="flex flex-col h-screen sticky top-0 left-0 h-full w-64 bg-slate-50 dark:bg-slate-900 font-sans tracking-tight font-medium">
+            <div class="p-8 flex flex-col gap-1">
+                <div class="flex items-center gap-2 mb-8">
+                    <div class="w-8 h-8 rounded-xl bg-on-primary-container flex items-center justify-center text-white">
+                        <span class="material-symbols-outlined text-sm"
+                            style="font-variation-settings: 'FILL' 1;">bolt</span>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-black tracking-tighter text-slate-900 dark:text-white leading-none">
+                            KINETIC</h1>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Admin Command Center</p>
+                    </div>
+                </div>
+                <nav class="space-y-1">
+                    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 transition-colors"
+                        href="admin.html">
+                        <span class="material-symbols-outlined">dashboard</span> <span>Dashboard</span>
+                    </a>
+                    <a class="flex items-center gap-3 px-4 py-3 text-orange-600 dark:text-orange-500 font-bold border-r-4 border-orange-600 bg-slate-100 dark:bg-slate-800 transition-all duration-150"
+                        href="admin-orders.html">
+                        <span class="material-symbols-outlined">local_shipping</span> <span>Orders</span>
+                    </a>
+                    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 transition-colors"
+                        href="admin-drivers.html">
+                        <span class="material-symbols-outlined">drive_eta</span> <span>Drivers</span>
+                    </a>
+                    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 transition-colors"
+                        href="admin-rabbitmq.html">
+                        <span class="material-symbols-outlined">hub</span> <span>RabbitMQ Monitor</span>
+                    </a>
+                </nav>
+            </div>
+
+            <div class="mt-auto p-8">
+                <button onclick="logout()"
+                    class="w-full bg-red-50 hover:bg-red-100 text-red-600 font-bold py-3 rounded-xl transition-colors border border-red-100 flex items-center justify-center gap-2">
+                    <span class="text-sm">Đăng xuất</span>
+                    <span class="material-symbols-outlined">logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-surface">
+            <header
+                class="w-full h-16 sticky top-0 z-50 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl flex justify-between items-center px-8 shadow-sm">
+                <div class="flex items-center gap-4 flex-1">
+                    <div class="relative max-w-md w-full">
+                        <span
+                            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+                        <input
+                            class="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-xl pl-10 py-2 text-sm focus:ring-0"
+                            placeholder="Search Command Center..." type="text" />
+                    </div>
+                </div>
+                <div class="flex items-center gap-6">
+                    <div class="text-right">
+                        <p class="text-xs font-bold text-slate-900 leading-none">Admin UTH</p>
+                        <p class="text-[10px] text-slate-500">Superuser</p>
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-8 space-y-8">
+                <div class="flex justify-between items-end">
+                    <div>
+                        <h2 class="text-3xl font-extrabold tracking-tight text-on-surface">Order Management</h2>
+                        <p class="text-on-surface-variant font-medium mt-1">Danh sách toàn bộ đơn hàng trong hệ thống
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm border border-outline-variant/10">
+                    <div
+                        class="px-8 py-6 border-b border-outline-variant/15 flex justify-between items-center bg-white">
+                        <h3 class="text-lg font-bold text-on-surface">Tất cả đơn hàng</h3>
+                        <div class="relative">
+                            <span
+                                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+                            <input id="search-order" onkeyup="filterOrders()"
+                                class="bg-slate-100 border-none rounded-xl pl-10 py-2 text-sm focus:ring-0 w-64"
+                                placeholder="Tìm kiếm mã đơn..." type="text" />
+                        </div>
+                    </div>
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-100">
+                                <th class="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Mã
+                                    đơn</th>
+                                <th class="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                                    Khách hàng</th>
+                                <th class="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                                    Trạng thái</th>
+                                <th class="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                                    Tuyến đường</th>
+                                <th class="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                                    Cước phí</th>
+                                <th class="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                                    Thời gian</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-all-orders-table" class="divide-y divide-outline-variant/10 bg-white">
+                            <tr>
+                                <td colspan="6" class="text-center py-6 text-slate-500 animate-pulse">Đang tải dữ
+                                    liệu...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8001';
+
+        function logout() {
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        let allOrders = [];
+
+        async function fetchAdminOrders() {
+            try {
+                const res = await fetch(`${API_URL}/api/admin/orders`, {
+                    method: 'GET',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    allOrders = data;
+                    renderOrders(data);
+                }
+            } catch (error) {
+                console.error("Lỗi cập nhật danh sách đơn hàng:", error);
+            }
+        }
+
+        function renderOrders(orders) {
+            let tableHTML = '';
+            if (!orders || orders.length === 0) {
+                tableHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-500">Chưa có đơn hàng nào.</td></tr>`;
+            } else {
+                orders.forEach(order => {
+                    let statusBadge = '';
+                    if (order.status === 'PENDING') {
+                        statusBadge = `<span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-[10px] font-black uppercase">PENDING</span>`;
+                    } else if (order.status === 'MATCHED') {
+                        statusBadge = `<span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-[10px] font-black uppercase">MATCHED</span>`;
+                    } else if (order.status === 'COMPLETED') {
+                        statusBadge = `<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-[10px] font-black uppercase">COMPLETED</span>`;
+                    } else {
+                        statusBadge = `<span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-[10px] font-black uppercase">${order.status}</span>`;
+                    }
+
+                    let dateStr = new Date(order.CreatedAt || order.created_at).toLocaleString('vi-VN');
+                    let fee = order.total_fee ? order.total_fee.toLocaleString('vi-VN') + ' đ' : 'Chưa tính';
+
+                    tableHTML += `
+                    <tr class="hover:bg-slate-50 transition-colors order-row">
+                        <td class="px-8 py-5 text-sm font-bold text-slate-800">${order.tracking_code}</td>
+                        <td class="px-8 py-5 text-sm text-slate-600 font-medium">${order.customer_id}</td>
+                        <td class="px-8 py-5">${statusBadge}</td>
+                        <td class="px-8 py-5">
+                            <div class="text-xs font-semibold text-slate-700 truncate max-w-[250px]">${order.pickup_address}</div>
+                            <div class="text-[10px] text-slate-400 mt-1">➔ ${order.delivery_address}</div>
+                        </td>
+                        <td class="px-8 py-5 text-sm text-slate-800 font-bold">${fee}</td>
+                        <td class="px-8 py-5 text-xs text-slate-500 font-medium">${dateStr}</td>
+                    </tr>
+                    `;
+                });
+            }
+            document.getElementById('admin-all-orders-table').innerHTML = tableHTML;
+        }
+
+        function filterOrders() {
+            const query = document.getElementById('search-order').value.toLowerCase();
+            const filtered = allOrders.filter(o =>
+                (o.tracking_code && o.tracking_code.toLowerCase().includes(query)) ||
+                (o.pickup_address && o.pickup_address.toLowerCase().includes(query)) ||
+                (o.delivery_address && o.delivery_address.toLowerCase().includes(query))
+            );
+            renderOrders(filtered);
+        }
+        // ==========================================
+        // CÁC HÀM THAO TÁC VỚI TÀI XẾ
+        // ==========================================
+        function viewDriver(id) {
+            // Tương lai anh có thể làm 1 cái Modal hiện thông tin xe cộ, CCCD của tài xế ở đây
+            alert("Tính năng xem chi tiết tài xế #" + id + " đang được phát triển!");
+        }
+
+        async function lockDriver(id) {
+            const confirmLock = confirm(`Bạn có chắc chắn muốn KHÓA tài khoản tài xế #${id} không?`);
+            if (!confirmLock) return;
+
+            // Nếu anh ĐÃ VIẾT API khóa tài xế ở Backend (order-service) thì mở comment đoạn code dưới ra:
+
+            try {
+                const res = await fetch(`${API_URL}/api/admin/drivers/${id}/lock`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    alert("Đã khóa tài xế thành công!");
+                    fetchAdminDrivers(); // Tải lại bảng
+                } else {
+                    alert("Lỗi khi khóa tài xế!");
+                }
+            } catch (error) {
+                alert("Lỗi kết nối máy chủ!");
+            }
+
+
+            // Tạm thời hiển thị thông báo nếu chưa có Backend
+            alert(`Đã gửi yêu cầu khóa tài xế #${id}! (Cần kết nối API Backend để hoạt động thực tế)`);
+        }
+        // Khởi chạy
+        fetchAdminOrders();
+    </script>
+</body>
+
+</html>

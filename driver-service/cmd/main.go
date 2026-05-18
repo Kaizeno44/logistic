@@ -24,9 +24,12 @@ var DB *gorm.DB
 
 func CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// CHỈ ĐỊNH RÕ PORT CỦA FRONTEND (Ở đây là cổng 80 của Web UI)
-		// Nếu lúc test Frontend chạy port 5500 (Live Server) thì anh đổi thành http://localhost:5500 nhé
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:80") 
+		origin := c.Request.Header.Get("Origin")
+		if origin != "" {
+			c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
+		} else {
+			c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		}
 		
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html class="light" lang="vi">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>RabbitMQ Monitor | UTH Express</title>
+    
+    <script>
+        const token = localStorage.getItem('jwt_token') || sessionStorage.getItem('jwt_token');
+        const role = localStorage.getItem('user_role') || sessionStorage.getItem('user_role');
+        // Nếu không có Token hoặc Role không phải là 'admin', đá văng ra ngoài
+        if (!token || role !== 'admin') {
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+    
+    <script id="tailwind-config">
+        tailwind.config = { darkMode: "class", theme: { extend: { colors: { "inverse-primary": "#ffb599", "tertiary-container": "#261906", "tertiary-fixed": "#f9debf", "surface-container-highest": "#dce2f7", "inverse-on-surface": "#edf0ff", "inverse-surface": "#293040", "surface-container": "#e9edff", "surface-variant": "#dce2f7", "surface-container-high": "#e1e8fd", "primary-container": "#370e00", "on-tertiary-container": "#968065", "on-error": "#ffffff", "primary": "#000000", "on-primary-container": "#e05814", "on-tertiary-fixed": "#261906", "on-secondary": "#ffffff", "on-primary": "#ffffff", "tertiary": "#000000", "secondary": "#575e70", "on-surface-variant": "#45464c", "surface-container-lowest": "#ffffff", "surface": "#f9f9ff", "background": "#f9f9ff", "on-tertiary-fixed-variant": "#55442d", "surface-dim": "#d3daef", "primary-fixed": "#ffdbce", "on-tertiary": "#ffffff", "on-surface": "#141b2b", "tertiary-fixed-dim": "#dcc2a4", "surface-bright": "#f9f9ff", "on-error-container": "#93000a", "on-primary-fixed-variant": "#7f2b00", "on-secondary-container": "#5c6274", "on-secondary-fixed": "#141b2b", "secondary-fixed": "#dce2f7", "secondary-fixed-dim": "#c0c6db", "primary-fixed-dim": "#ffb599", "on-primary-fixed": "#370e00", "outline-variant": "#c6c6cd", "surface-tint": "#a63b00", "outline": "#76777d", "error-container": "#ffdad6", "error": "#ba1a1a", "surface-container-low": "#f1f3ff", "on-secondary-fixed-variant": "#404758", "secondary-container": "#d9dff5", "on-background": "#141b2b" }, borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, fontFamily: { "headline": ["Inter"], "body": ["Inter"], "label": ["Inter"] } } } }
+    </script>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+    <div class="flex min-h-screen">
+        
+        <aside class="flex flex-col h-screen sticky top-0 left-0 h-full w-64 bg-slate-50 dark:bg-slate-900 font-sans tracking-tight font-medium">
+            <div class="p-8 flex flex-col gap-1">
+                <div class="flex items-center gap-2 mb-8">
+                    <div class="w-8 h-8 rounded-xl bg-on-primary-container flex items-center justify-center text-white">
+                        <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">bolt</span>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-black tracking-tighter text-slate-900 dark:text-white leading-none">KINETIC</h1>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Admin Command Center</p>
+                    </div>
+                </div>
+                <nav class="space-y-1">
+                    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 transition-colors" href="admin.html">
+                        <span class="material-symbols-outlined">dashboard</span> <span>Dashboard</span>
+                    </a>
+                    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 transition-colors" href="admin-orders.html">
+                        <span class="material-symbols-outlined">local_shipping</span> <span>Orders</span>
+                    </a>
+                    <a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 transition-colors" href="admin-drivers.html">
+                        <span class="material-symbols-outlined">drive_eta</span> <span>Drivers</span>
+                    </a>
+                    <a class="flex items-center gap-3 px-4 py-3 text-orange-600 dark:text-orange-500 font-bold border-r-4 border-orange-600 bg-slate-100 dark:bg-slate-800 transition-all duration-150" href="admin-rabbitmq.html">
+                        <span class="material-symbols-outlined">hub</span> <span>RabbitMQ Monitor</span>
+                    </a>
+                </nav>
+            </div>
+            
+            <div class="mt-auto p-8">
+                <button onclick="logout()" class="w-full bg-red-50 hover:bg-red-100 text-red-600 font-bold py-3 rounded-xl transition-colors border border-red-100 flex items-center justify-center gap-2">
+                    <span class="text-sm">Đăng xuất</span>
+                    <span class="material-symbols-outlined">logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-surface">
+            <header class="w-full h-16 sticky top-0 z-50 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl flex justify-between items-center px-8 shadow-sm">
+                <div class="flex items-center gap-4 flex-1">
+                    <div class="relative max-w-md w-full">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+                        <input class="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-xl pl-10 py-2 text-sm focus:ring-0" placeholder="Search Command Center..." type="text"/>
+                    </div>
+                </div>
+                <div class="flex items-center gap-6">
+                    <div class="text-right">
+                        <p class="text-xs font-bold text-slate-900 leading-none">Admin UTH</p>
+                        <p class="text-[10px] text-slate-500">Superuser</p>
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-8 space-y-8">
+                <div class="flex justify-between items-end">
+                    <div>
+                        <h2 class="text-3xl font-extrabold tracking-tight text-on-surface">RabbitMQ Queues</h2>
+                        <p class="text-on-surface-variant font-medium mt-1">Giám sát trạng thái thông điệp hệ thống</p>
+                    </div>
+                    <a href="http://localhost:15672" target="_blank" class="flex items-center gap-2 bg-slate-800 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-700 transition-colors">
+                        Mở RabbitMQ Gốc
+                        <span class="material-symbols-outlined text-sm">open_in_new</span>
+                    </a>
+                </div>
+
+                <div id="rabbitmq-queues-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Queue cards will be injected here -->
+                    <div class="col-span-3 text-center py-10 text-slate-500 animate-pulse font-medium">
+                        Đang lấy dữ liệu từ RabbitMQ Server...
+                    </div>
+                </div>
+                
+                <div class="bg-surface-container-lowest rounded-xl p-8 border border-outline-variant/10 shadow-sm mt-8">
+                    <div class="flex items-center gap-3 text-slate-800 font-bold mb-4">
+                        <span class="material-symbols-outlined text-blue-500">info</span>
+                        Chú thích thuật ngữ
+                    </div>
+                    <ul class="space-y-3 text-sm text-slate-600">
+                        <li><b class="text-slate-800">Ready:</b> Số lượng messages đang chờ trong hàng đợi, chưa có worker nào lấy để xử lý.</li>
+                        <li><b class="text-slate-800">Unacked (Unacknowledged):</b> Số lượng messages đã được gửi cho worker, nhưng worker chưa gửi tín hiệu hoàn thành (ACK) về lại cho RabbitMQ.</li>
+                        <li><b class="text-slate-800">Total:</b> Tổng số lượng messages (Ready + Unacked).</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8001';
+
+        function logout() {
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        async function fetchRabbitMQStats() {
+            try {
+                const res = await fetch(`${API_URL}/api/admin/rabbitmq/stats`, {
+                    method: 'GET',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    renderQueues(data);
+                } else {
+                    document.getElementById('rabbitmq-queues-container').innerHTML = `
+                        <div class="col-span-3 text-center py-10 text-red-500 font-medium">
+                            Không thể kết nối với RabbitMQ Management API.
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error("Lỗi lấy dữ liệu RabbitMQ:", error);
+                document.getElementById('rabbitmq-queues-container').innerHTML = `
+                        <div class="col-span-3 text-center py-10 text-red-500 font-medium">
+                            Lỗi mạng hoặc server không phản hồi.
+                        </div>
+                    `;
+            }
+        }
+
+        function renderQueues(queues) {
+            let containerHTML = '';
+            
+            if (!Array.isArray(queues) || queues.length === 0) {
+                containerHTML = `
+                    <div class="col-span-3 text-center py-10 text-slate-500 font-medium">
+                        Không có hàng đợi nào.
+                    </div>
+                `;
+            } else {
+                queues.forEach(q => {
+                    const total = q.messages || 0;
+                    const ready = q.messages_ready || 0;
+                    const unacked = q.messages_unacknowledged || 0;
+                    const state = q.state || 'unknown';
+                    
+                    let stateColor = 'bg-slate-100 text-slate-600';
+                    let stateDot = 'bg-slate-400';
+                    if (state === 'running') {
+                        stateColor = 'bg-green-50 text-green-700';
+                        stateDot = 'bg-green-500 animate-pulse';
+                    } else if (state === 'idle') {
+                        stateColor = 'bg-blue-50 text-blue-700';
+                        stateDot = 'bg-blue-500';
+                    }
+
+                    containerHTML += `
+                    <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/10 shadow-sm relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4">
+                             <div class="px-2 py-1 ${stateColor} rounded-md text-[10px] font-black uppercase flex items-center gap-1.5 border border-outline-variant/5">
+                                <span class="w-1.5 h-1.5 ${stateDot} rounded-full"></span> ${state}
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-orange-500">
+                                <span class="material-symbols-outlined">queue</span>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-800 tracking-tight text-lg leading-tight truncate pr-16" title="${q.name}">${q.name}</h3>
+                                <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">Queue</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-4 mb-4">
+                            <div class="text-center p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase">Ready</p>
+                                <p class="text-xl font-black text-slate-800 mt-1">${ready}</p>
+                            </div>
+                            <div class="text-center p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase">Unacked</p>
+                                <p class="text-xl font-black text-orange-600 mt-1">${unacked}</p>
+                            </div>
+                            <div class="text-center p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase">Total</p>
+                                <p class="text-xl font-black text-blue-600 mt-1">${total}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center text-xs text-slate-500 font-medium">
+                            <span>Consumers: ${q.consumers || 0}</span>
+                            <span>Memory: ${(q.memory / 1024).toFixed(2)} KB</span>
+                        </div>
+                    </div>
+                    `;
+                });
+            }
+
+            document.getElementById('rabbitmq-queues-container').innerHTML = containerHTML;
+        }
+
+        // Khởi chạy ngay và lặp lại mỗi 3 giây
+        fetchRabbitMQStats();
+        setInterval(fetchRabbitMQStats, 3000);
+    </script>
+</body>
+</html>
