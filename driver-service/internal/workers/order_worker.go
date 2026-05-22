@@ -90,7 +90,10 @@ func StartOrderConsumer(rabbitURL string, db *gorm.DB) { // Thêm param db *gorm
 
 				// Cập nhật trạng thái tài xế và đơn hàng trong DB (Pending -> Matching)
 				db.Model(&Driver{}).Where("id = ?", matchedDriver.ID).Update("status", "BUSY")
-				db.Table("orders").Where("id = ?", order.ID).Update("status", "MATCHED")
+				db.Table("orders").Where("id = ?", order.ID).Updates(map[string]interface{}{
+					"status":    "MATCHED",
+					"driver_id": matchedDriver.ID,
+				})
 
 				d.Ack(false) // Xóa tin nhắn khỏi RabbitMQ
 			} else {

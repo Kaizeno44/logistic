@@ -136,7 +136,7 @@
                             </div>
                             <div class="bg-white/10 p-5 rounded-2xl backdrop-blur-sm">
                                 <p class="text-slate-400 text-[10px] uppercase tracking-widest font-bold mb-2">Lưu ý tài xế</p>
-                                <p class="text-lg font-bold text-orange-400">Gọi điện cho khách trước khi đến</p>
+                                <p id="displayNote" class="text-lg font-bold text-orange-400">...</p>
                             </div>
                         </div>
                     </div>
@@ -258,6 +258,7 @@
                     document.getElementById('displaySenderPhone').innerText = order.sender_phone || "Không có SĐT";
                     document.getElementById('displayReceiverName').innerText = order.receiver_name || "Chưa cập nhật";
                     document.getElementById('displayReceiverPhone').innerText = order.receiver_phone || "Không có SĐT";
+                    document.getElementById('displayNote').innerText = order.note || "Không có ghi chú";
 
                     // Chuyển giao diện sang ĐÃ CÓ ĐƠN
                     document.getElementById('activeOrderCard').style.display = 'block';

@@ -159,35 +159,40 @@ func main() {
 
 		// 3. TÌM ĐƠN HÀNG (DÙNG ĐÚNG STRUCT models.Order ĐỂ KHÔNG BỊ LỖI SQL)
 		var order models.Order
-		err := DB.Where("status IN ? AND weight <= ?", []string{"PENDING", "MATCHED"}, vehicle.MaxWeight).
-			Order("weight desc, created_at asc").
-			First(&order).Error
+		// Bước 1: Tìm xem có đơn nào ĐÃ ĐƯỢC GÁN cho tài xế này chưa
+		err := DB.Where("status = ? AND driver_id = ?", "MATCHED", driver.ID).First(&order).Error
 
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"message": "Hệ thống đang tìm đơn..."})
-			return
-		}
+			// Bước 2: Nếu chưa có, quét đơn PENDING phù hợp tải trọng
+			err = DB.Where("status = ? AND weight <= ?", "PENDING", vehicle.MaxWeight).
+				Order("weight desc, created_at asc").
+				First(&order).Error
 
-		// 4. Khóa đơn
-		// 4. Khóa đơn an toàn (Chống Race Condition)
-		if order.Status == "PENDING" {
-			// Cập nhật với điều kiện nghiêm ngặt: Chỉ update nếu nó THỰC SỰ vẫn đang PENDING
+			if err != nil {
+				c.JSON(http.StatusNotFound, gin.H{"message": "Hệ thống đang tìm đơn..."})
+				return
+			}
+
+			// 4. Khóa đơn an toàn (Chống Race Condition)
 			result := DB.Model(&models.Order{}).
 				Where("id = ? AND status = ?", order.ID, "PENDING").
-				Update("status", "MATCHED")
+				Updates(map[string]interface{}{
+					"status":    "MATCHED",
+					"driver_id": driver.ID,
+				})
 
 			if result.Error != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi hệ thống khi nhận đơn"})
 				return
 			}
 
-			// Nếu RowsAffected == 0, nghĩa là trong tích tắc vừa rồi có người khác đã nhận mất
 			if result.RowsAffected == 0 {
 				c.JSON(http.StatusConflict, gin.H{"error": "Rất tiếc, đơn hàng vừa bị tài xế khác nhận mất!"})
 				return
 			}
 
 			order.Status = "MATCHED"
+			order.DriverID = &driver.ID
 		}
 		c.JSON(http.StatusOK, order)
 	})
@@ -245,6 +250,17 @@ func main() {
 			}
 			if err := DB.Create(&driver).Error; err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi khi tạo hồ sơ Tài xế"})
+				return
+			}
+		}
+
+		// 2. KIỂM TRA ĐƠN HÀNG MATCHED HIỆN TẠI
+		var activeOrder models.Order
+		errOrder := DB.Where("status = ? AND driver_id = ?", "MATCHED", driver.ID).First(&activeOrder).Error
+		if errOrder == nil {
+			// Tài xế đang có đơn MATCHED. Kiểm tra tải trọng xe mới!
+			if activeOrder.Weight > input.MaxWeight {
+				c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Không thể đổi xe! Bạn đang giữ đơn hàng nặng %.1fkg vượt quá tải trọng xe mới.", activeOrder.Weight)})
 				return
 			}
 		}

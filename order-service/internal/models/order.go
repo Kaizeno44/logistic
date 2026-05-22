@@ -9,6 +9,7 @@ type Order struct {
 
 	// Đánh index cho TrackingCode để tra cứu siêu tốc
 	TrackingCode string `gorm:"uniqueIndex" json:"tracking_code"`
+	DriverID     *uint  `json:"driver_id"` // ID tài xế được phân công
 
 	SenderName    string `json:"sender_name"`
 	SenderPhone   string `json:"sender_phone"`
@@ -18,6 +19,7 @@ type Order struct {
 	// 1. Thông tin hàng hóa (Phục vụ phân loại xe)
 	ItemType string  `json:"item_type"` // VD: Thời trang, Hàng dễ vỡ...
 	Weight   float64 `json:"weight"`    // Khối lượng để tính tải trọng xe
+	Note     string  `json:"note"`      // Ghi chú cho tài xế
 
 	// 2. Thông tin Tọa độ/Khu vực (Phục vụ Matching tài xế theo Zone)
 	PickupDistrictID   uint `json:"pickup_district_id"`
