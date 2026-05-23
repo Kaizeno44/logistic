@@ -392,11 +392,11 @@
                 
                 pickup_district_id: parseInt(document.getElementById('pickupDistrict').value),
                 pickup_ward_id: parseInt(document.getElementById('pickupWard').value),
-                pickup_address: document.getElementById('pickupAddress').value,
+                pickup_address: `${document.getElementById('pickupAddress').value}, ${document.getElementById('pickupWard').options[document.getElementById('pickupWard').selectedIndex].text}, ${document.getElementById('pickupDistrict').options[document.getElementById('pickupDistrict').selectedIndex].text}, Hồ Chí Minh`,
                 
                 delivery_district_id: parseInt(document.getElementById('deliveryDistrict').value),
                 delivery_ward_id: parseInt(document.getElementById('deliveryWard').value),
-                delivery_address: document.getElementById('deliveryAddress').value,
+                delivery_address: `${document.getElementById('deliveryAddress').value}, ${document.getElementById('deliveryWard').options[document.getElementById('deliveryWard').selectedIndex].text}, ${document.getElementById('deliveryDistrict').options[document.getElementById('deliveryDistrict').selectedIndex].text}, Hồ Chí Minh`,
                 sender_name: document.getElementById('senderName').value,
                 sender_phone: document.getElementById('senderPhone').value,
                 receiver_name: document.getElementById('receiverName').value,

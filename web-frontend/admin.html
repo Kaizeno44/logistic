@@ -184,7 +184,7 @@
                                 statusBadge = `<span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-[10px] font-black uppercase">${order.status}</span>`;
                             }
 
-                            let dateStr = new Date(order.created_at).toLocaleTimeString('vi-VN');
+                            let dateStr = new Date(order.CreatedAt || order.created_at).toLocaleString('vi-VN');
 
                             tableHTML += `
                             <tr class="hover:bg-slate-50 transition-colors">

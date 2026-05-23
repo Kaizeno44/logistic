@@ -6,6 +6,7 @@ WORKDIR /app
 # THÊM DÒNG NÀY ĐỂ ÉP DÙNG SERVER CHÍNH THỨC CỦA GOLANG:
     ENV GOPROXY=https://proxy.golang.org,direct
 
+    RUN apk add --no-cache git
     COPY go.mod go.sum ./
     RUN go mod download
 

@@ -391,12 +391,13 @@ func main() {
 				Username string `json:"username"`
 				Email    string `json:"email"`
 				Status   string `json:"status"`
+				Role     string `json:"role"`
 			}
 			var results []DriverResponse
 			err := db.Table("users").
-				Select("users.id, users.username, users.email, COALESCE(drivers.status, 'OFFLINE') as status").
+				Select("users.id, users.username, users.email, users.role, COALESCE(drivers.status, 'OFFLINE') as status").
 				Joins("LEFT JOIN drivers ON drivers.user_id = users.id").
-				Where("users.role = ?", "driver").
+				Where("users.role IN ?", []string{"driver", "locked"}).
 				Scan(&results).Error
 
 			if err != nil {
@@ -461,6 +462,30 @@ func main() {
 			}
 
 			c.JSON(http.StatusOK, gin.H{"message": "Đã khóa tài xế thành công!"})
+		})
+
+		// ==========================================
+		// API: ADMIN MỞ KHÓA TÀI KHOẢN TÀI XẾ
+		// ==========================================
+		protected.PUT("/admin/drivers/:id/unlock", middlewares.AdminAuth(), func(c *gin.Context) {
+			driverID := c.Param("id")
+
+			// Đổi Role của tài xế từ "locked" về lại "driver"
+			result := db.Model(&models.User{}).
+				Where("id = ? AND role = ?", driverID, "locked").
+				Update("role", "driver")
+
+			if result.Error != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Lỗi hệ thống khi mở khóa tài khoản!"})
+				return
+			}
+
+			if result.RowsAffected == 0 {
+				c.JSON(http.StatusNotFound, gin.H{"error": "Không tìm thấy tài xế này hoặc tài khoản không bị khóa!"})
+				return
+			}
+
+			c.JSON(http.StatusOK, gin.H{"message": "Đã mở khóa tài khoản thành công!"})
 		})
 
 		// ==========================================

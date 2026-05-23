@@ -30,6 +30,8 @@
         body {
             font-family: 'Inter', sans-serif;
         }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
     </style>
 
     <script id="tailwind-config">
@@ -152,6 +154,106 @@
         </main>
     </div>
 
+    <!-- Driver Details Modal -->
+    <div id="driverModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeDriverModal()"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden animate-[fadeIn_0.2s_ease-out]">
+            <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="font-black text-lg text-slate-800 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-blue-500">badge</span>
+                    Hồ sơ tài xế
+                </h3>
+                <button onclick="closeDriverModal()" class="text-slate-400 hover:text-red-500 transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-6">
+                <div class="flex items-center gap-4 border-b border-slate-100 pb-6">
+                    <div class="w-16 h-16 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-black text-2xl" id="modalDriverAvatar">A</div>
+                    <div>
+                        <p class="text-xs uppercase font-bold tracking-widest text-slate-400 mb-1" id="modalDriverId">#...</p>
+                        <p class="text-xl font-black text-slate-800" id="modalDriverName">...</p>
+                        <div class="mt-2" id="modalDriverStatus"></div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <span class="material-symbols-outlined text-slate-400">mail</span>
+                        <div>
+                            <p class="text-[10px] uppercase font-bold tracking-widest text-slate-400">Email liên hệ</p>
+                            <p class="font-semibold text-slate-700" id="modalDriverEmail">...</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <span class="material-symbols-outlined text-slate-400">info</span>
+                        <div>
+                            <p class="text-[10px] uppercase font-bold tracking-widest text-slate-400">Thông báo từ hệ thống</p>
+                            <p class="font-medium text-slate-500 text-sm italic">Tính năng xem lịch sử cuốc xe đang được nâng cấp.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-end">
+                <button onclick="closeDriverModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-sm transition-colors shadow-sm">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lock Driver Confirmation Modal -->
+    <div id="lockModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeLockModal()"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden animate-[fadeIn_0.2s_ease-out]">
+            <div class="p-6 text-center space-y-4 mt-4">
+                <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center text-red-500 mx-auto">
+                    <span class="material-symbols-outlined text-3xl">warning</span>
+                </div>
+                <h3 class="font-black text-xl text-slate-800">Khóa tài khoản?</h3>
+                <p class="text-sm text-slate-500 font-medium leading-relaxed">
+                    Bạn có chắc chắn muốn khóa tài khoản tài xế <strong id="lockModalDriverName" class="text-slate-700"></strong> không?<br>
+                    <span class="text-xs text-red-500 mt-2 block">Tài xế sẽ không thể đăng nhập và sẽ bị loại khỏi danh sách điều phối.</span>
+                </p>
+            </div>
+            <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-center gap-3">
+                <button onclick="closeLockModal()" class="px-5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-sm transition-colors shadow-sm w-full">
+                    Hủy bỏ
+                </button>
+                <button id="btnConfirmLock" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-sm transition-colors shadow-sm w-full flex justify-center items-center gap-2">
+                    Khóa ngay
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unlock Driver Confirmation Modal -->
+    <div id="unlockModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeUnlockModal()"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden animate-[fadeIn_0.2s_ease-out]">
+            <div class="p-6 text-center space-y-4 mt-4">
+                <div class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-500 mx-auto">
+                    <span class="material-symbols-outlined text-3xl">lock_open</span>
+                </div>
+                <h3 class="font-black text-xl text-slate-800">Mở khóa tài khoản?</h3>
+                <p class="text-sm text-slate-500 font-medium leading-relaxed">
+                    Bạn có chắc chắn muốn mở khóa cho tài xế <strong id="unlockModalDriverName" class="text-slate-700"></strong> không?<br>
+                    <span class="text-xs text-emerald-600 mt-2 block">Tài xế sẽ có thể đăng nhập và nhận đơn hàng trở lại.</span>
+                </p>
+            </div>
+            <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 flex justify-center gap-3">
+                <button onclick="closeUnlockModal()" class="px-5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-sm transition-colors shadow-sm w-full">
+                    Hủy bỏ
+                </button>
+                <button id="btnConfirmUnlock" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm transition-colors shadow-sm w-full flex justify-center items-center gap-2">
+                    Mở khóa
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const API_URL = 'http://localhost:8001';
 
@@ -187,7 +289,18 @@
             } else {
                 drivers.forEach(driver => {
                     let statusBadge = '';
-                    if (driver.status === 'ONLINE') {
+                    let rowClass = 'hover:bg-slate-50 transition-colors';
+                    let actionBtn = `<button onclick="lockDriver(${driver.id})" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded-lg transition-colors" title="Khóa tài khoản">
+                                <span class="material-symbols-outlined text-[18px]">lock</span>
+                            </button>`;
+
+                    if (driver.role === 'locked') {
+                        statusBadge = `<span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-[10px] font-black uppercase flex items-center gap-1 w-max"><span class="material-symbols-outlined text-[14px]">block</span>BỊ KHÓA</span>`;
+                        rowClass = 'bg-slate-50 opacity-60 grayscale-[50%] transition-colors';
+                        actionBtn = `<button onclick="unlockDriver(${driver.id})" class="text-emerald-500 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 p-1.5 rounded-lg transition-colors" title="Mở khóa tài khoản">
+                                <span class="material-symbols-outlined text-[18px]">lock_open</span>
+                            </button>`;
+                    } else if (driver.status === 'ONLINE') {
                         statusBadge = `<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-[10px] font-black uppercase flex items-center gap-1 w-max"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>ONLINE</span>`;
                     } else if (driver.status === 'BUSY') {
                         statusBadge = `<span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-[10px] font-black uppercase flex items-center gap-1 w-max"><span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>BUSY</span>`;
@@ -196,7 +309,7 @@
                     }
 
                     tableHTML += `
-                    <tr class="hover:bg-slate-50 transition-colors">
+                    <tr class="${rowClass}">
                         <td class="px-8 py-5 text-sm font-bold text-slate-800">#${driver.id}</td>
                         <td class="px-8 py-5 text-sm font-semibold text-slate-800">${driver.username}</td>
                         <td class="px-8 py-5 text-sm text-slate-600 font-medium">${driver.email}</td>
@@ -205,9 +318,7 @@
                             <button onclick="viewDriver(${driver.id})" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-1.5 rounded-lg transition-colors" title="Xem chi tiết">
                                 <span class="material-symbols-outlined text-[18px]">visibility</span>
                             </button>
-                            <button onclick="lockDriver(${driver.id})" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded-lg transition-colors" title="Khóa tài khoản">
-                                <span class="material-symbols-outlined text-[18px]">lock</span>
-                            </button>
+                            ${actionBtn}
                         </td>
                     </tr>
                     `;
@@ -223,6 +334,126 @@
                 (d.email && d.email.toLowerCase().includes(query))
             );
             renderDrivers(filtered);
+        }
+
+        let currentLockId = null;
+
+        function lockDriver(id) {
+            const driver = allDrivers.find(d => d.id === id);
+            if (driver) {
+                currentLockId = id;
+                document.getElementById('lockModalDriverName').innerText = driver.username;
+                document.getElementById('lockModal').classList.remove('hidden');
+            }
+        }
+
+        function closeLockModal() {
+            document.getElementById('lockModal').classList.add('hidden');
+            currentLockId = null;
+        }
+
+        document.getElementById('btnConfirmLock').addEventListener('click', async () => {
+            if (!currentLockId) return;
+            
+            const btn = document.getElementById('btnConfirmLock');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Đang xử lý...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_URL}/api/admin/drivers/${currentLockId}/lock`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    closeLockModal();
+                    fetchAdminDrivers(); // Tải lại danh sách
+                } else {
+                    alert("Lỗi: " + (data.error || "Không thể khóa tài xế"));
+                }
+            } catch (error) {
+                alert("Lỗi kết nối máy chủ");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        let currentUnlockId = null;
+
+        function unlockDriver(id) {
+            const driver = allDrivers.find(d => d.id === id);
+            if (driver) {
+                currentUnlockId = id;
+                document.getElementById('unlockModalDriverName').innerText = driver.username;
+                document.getElementById('unlockModal').classList.remove('hidden');
+            }
+        }
+
+        function closeUnlockModal() {
+            document.getElementById('unlockModal').classList.add('hidden');
+            currentUnlockId = null;
+        }
+
+        document.getElementById('btnConfirmUnlock').addEventListener('click', async () => {
+            if (!currentUnlockId) return;
+            
+            const btn = document.getElementById('btnConfirmUnlock');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Đang xử lý...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`${API_URL}/api/admin/drivers/${currentUnlockId}/unlock`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    closeUnlockModal();
+                    fetchAdminDrivers(); // Tải lại danh sách
+                } else {
+                    alert("Lỗi: " + (data.error || "Không thể mở khóa tài xế"));
+                }
+            } catch (error) {
+                alert("Lỗi kết nối máy chủ");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        function viewDriver(id) {
+            const driver = allDrivers.find(d => d.id === id);
+            if (driver) {
+                document.getElementById('modalDriverId').innerText = `#${driver.id}`;
+                document.getElementById('modalDriverName').innerText = driver.username;
+                document.getElementById('modalDriverEmail').innerText = driver.email;
+                document.getElementById('modalDriverAvatar').innerText = driver.username.charAt(0).toUpperCase();
+
+                let statusBadge = '';
+                if (driver.role === 'locked') {
+                    statusBadge = `<span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-[10px] font-black uppercase flex items-center gap-1 w-max"><span class="material-symbols-outlined text-[14px]">block</span>BỊ KHÓA</span>`;
+                } else if (driver.status === 'ONLINE') {
+                    statusBadge = `<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-[10px] font-black uppercase flex items-center gap-1 w-max"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>ONLINE</span>`;
+                } else if (driver.status === 'BUSY') {
+                    statusBadge = `<span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-[10px] font-black uppercase flex items-center gap-1 w-max"><span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>BUSY</span>`;
+                } else {
+                    statusBadge = `<span class="px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-[10px] font-black uppercase flex items-center gap-1 w-max"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>OFFLINE</span>`;
+                }
+                document.getElementById('modalDriverStatus').innerHTML = statusBadge;
+
+                document.getElementById('driverModal').classList.remove('hidden');
+            } else {
+                alert("Không tìm thấy thông tin tài xế này.");
+            }
+        }
+
+        function closeDriverModal() {
+            document.getElementById('driverModal').classList.add('hidden');
         }
 
         // Khởi chạy

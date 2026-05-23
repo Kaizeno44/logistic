@@ -5,6 +5,7 @@ WORKDIR /app
 # Thêm dòng này để đổi proxy, giúp tải thư viện Go nhanh gấp 10 lần
 ENV GOPROXY=https://goproxy.io,direct
 
+RUN apk add --no-cache git
 COPY go.mod go.sum ./
 RUN go mod download
 
