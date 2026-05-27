@@ -45,26 +45,23 @@ func PublishOrderCreated(body []byte) error {
 	})
 }
 
-// Thả hàm này vào file queue/rabbitmq.go của anh (ĐÃ SỬA LỖI & CHUẨN HÓA)
 func PublishNotificationEvent(body []byte) {
-	// Dùng context giới hạn thời gian 5 giây để tránh bị treo Server
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// DÙNG BIẾN 'Channel' VÀ HÀM 'PublishWithContext' ĐÚNG CHUẨN CỦA ANH
 	err := Channel.PublishWithContext(ctx,
-		"",                   // exchange
-		"notification_queue", // routing key (Tên hàng đợi cho việc gửi Email)
-		false,                // mandatory
-		false,                // immediate
+		"",
+		"notification_queue",
+		false,
+		false,
 		amqp.Publishing{
 			ContentType: "application/json",
 			Body:        body,
 		})
 
 	if err != nil {
-		log.Println("❌ Lỗi đẩy Notification vào RabbitMQ:", err)
+		log.Println("Lỗi đẩy Notification vào RabbitMQ:", err)
 	} else {
-		log.Println("✅ Đã ném yêu cầu gửi Email vào RabbitMQ thành công!")
+		log.Println("Đã ném yêu cầu gửi Email vào RabbitMQ thành công!")
 	}
 }
