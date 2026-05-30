@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -79,7 +79,7 @@
 
             try {
                 // 1. Gọi Order Service (8001) để Tạo tài khoản
-                const resAuth = await fetch('http://localhost:8001/api/auth/register-driver', {
+                const resAuth = await fetch('http://localhost:8080/api/auth/register-driver', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, email, password })
@@ -98,7 +98,7 @@
                 localStorage.setItem('jwt_token', token);
 
                 // 2. Gọi Driver Service (8002) để Đăng ký Xe vào hồ sơ
-                const resVehicle = await fetch('http://localhost:8002/api/drivers/register-vehicle', {
+                const resVehicle = await fetch('http://localhost:8080/api/drivers/register-vehicle', {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',

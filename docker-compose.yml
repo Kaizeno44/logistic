@@ -40,6 +40,18 @@ services:
   # PHẦN 2: CÁC MICROSERVICES CỦA ANH
   # ==========================================
 
+  api-gateway:
+    build: 
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: logistics_api_gateway
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - order-service
+      - driver-service
+
   order-service:
     build: 
       context: ./order-service

@@ -63,6 +63,15 @@ func StartOrderConsumer(rabbitURL string, db *gorm.DB) { // Thêm param db *gorm
 			var order OrderMessage
 			json.Unmarshal(d.Body, &order)
 
+			// KIỂM TRA TRẠNG THÁI ĐƠN HÀNG TRƯỚC KHI TÌM TÀI XẾ
+			var currentStatus string
+			errStatus := db.Table("orders").Where("tracking_code = ?", order.TrackingCode).Select("status").Row().Scan(&currentStatus)
+			if errStatus == nil && currentStatus != "PENDING" {
+				log.Printf("⏩ Đơn hàng %s đã được xử lý bằng cách khác (Trạng thái hiện tại: %s). Hủy message khỏi Queue.", order.TrackingCode, currentStatus)
+				d.Ack(false)
+				continue
+			}
+
 			log.Printf("---------------------------------------------------")
 			log.Printf("📦 TÌM KIẾM TÀI XẾ CHO ĐƠN: %s", order.TrackingCode)
 			log.Printf("🔍 Yêu cầu: Nằm tại Quận ID %d | Nặng: %.1f kg | Loại: %s", order.PickupDistrictID, order.Weight, order.ItemType)
